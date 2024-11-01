@@ -1,0 +1,72 @@
+C51 COMPILER V9.60.7.0   DRIVER_DEBUG                                                      03/20/2024 16:16:52 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE DRIVER_DEBUG
+OBJECT MODULE PLACED IN .\Output\driver_debug.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE ..\driver\driver_debug\src\driver_debug.c LARGE OMF2 OPTIMIZE(7,SPEED) B
+                    -ROWSE INCDIR(..\driver;..\driver\driver_debug\inc;..\library\library_app\inc;..\library\library_debug\inc;..\driver\driv
+                    -er_app\inc;..\library\library_i2c\inc) DEBUG PRINT(.\lst\driver_debug.lst) TABS(2) OBJECT(.\Output\driver_debug.obj)
+
+line level    source
+
+   1          #include "driver_debug.h"
+   2          #include "ms51_16k.h"
+   3          
+   4          void timer2_delay_us(unsigned int time_delay)
+   5          {
+   6   1        T2MOD |= (1 << T2DIV1);   // f = fsys/16 = 1MHz
+   7   1        
+   8   1        TL2 = (65535 - time_delay ) & 0xff;
+   9   1        TH2 = (65535 - time_delay ) >> 8;
+  10   1        T2CON |= (1 << TR2);
+  11   1        while((1 & (T2CON >> TF2)) == 0);
+  12   1        T2CON &= ~(1 << TF2);
+  13   1        T2CON &= ~(1 << TR2);
+  14   1      }
+  15          
+  16          void timer2_delay_ms(unsigned int time_delay)
+  17          {
+  18   1        T2MOD |= (1 << T2DIV1);   // f = fsys/16 = 1MHz
+  19   1        while(time_delay)
+  20   1        {
+  21   2          TL2 = (65535 - 1000 ) & 0xff;
+  22   2          TH2 = (65535 - 1000 ) >> 8;
+  23   2          T2CON |= (1 << TR2);
+  24   2          while((1 & (T2CON >> TF2)) == 0);
+  25   2          T2CON &= ~(1 << TF2);
+  26   2          T2CON &= ~(1 << TR2);
+  27   2          time_delay --;
+  28   2        }
+  29   1      }
+  30          
+  31          void timer2_delay_193us(void)
+  32          {
+  33   1        T2MOD |= (1 << T2DIV1);   // f = fsys/16 = 1MHz
+  34   1        
+  35   1        TL2 = (65535 - 200 ) & 0xff;
+  36   1        TH2 = (65535 - 200 ) >> 8;
+  37   1        T2CON |= (1 << TR2);
+  38   1        while((1 & (T2CON >> TF2)) == 0);
+  39   1        T2CON &= ~(1 << TF2);
+  40   1        T2CON &= ~(1 << TR2);
+  41   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    168    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----       2
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+C51 COMPILER V9.60.7.0   DRIVER_DEBUG                                                      03/20/2024 16:16:52 PAGE 2   
+
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

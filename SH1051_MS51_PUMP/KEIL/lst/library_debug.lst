@@ -1,0 +1,107 @@
+C51 COMPILER V9.60.7.0   LIBRARY_DEBUG                                                     03/20/2024 16:16:52 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE LIBRARY_DEBUG
+OBJECT MODULE PLACED IN .\Output\library_debug.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE ..\library\library_debug\src\library_debug.c LARGE OMF2 OPTIMIZE(7,SPEED
+                    -) BROWSE INCDIR(..\driver;..\driver\driver_debug\inc;..\library\library_app\inc;..\library\library_debug\inc;..\driver\d
+                    -river_app\inc;..\library\library_i2c\inc) DEBUG PRINT(.\lst\library_debug.lst) TABS(2) OBJECT(.\Output\library_debug.obj
+                    -)
+
+line level    source
+
+   1          #include "driver_debug.h"
+   2          #include "library_debug.h"
+   3          #include "ms51_16k.h"
+   4          
+   5          void uart_sw_init(void)
+   6          {
+   7   1        P16_PUSHPULL_MODE;
+   8   1      }
+   9          void uart_sw_tx_high(void)
+  10          {
+  11   1        P16 = 1;
+  12   1      }
+  13          void uart_sw_tx_low(void)
+  14          {
+  15   1        P16 = 0;
+  16   1      }
+  17          
+  18          void uart_sw_send_byte(unsigned char TxData)
+  19          {
+  20   1        unsigned char i;
+  21   1      
+  22   1        uart_sw_tx_low();   // start 
+  23   1        timer2_delay_us(BAUDRATE);
+  24   1        for (i = 0; i < 8; i++)      //send 8-bit data
+  25   1        {
+  26   2      
+  27   2          if (TxData & 0x01)
+  28   2          {
+  29   3            uart_sw_tx_high();
+  30   3          }
+  31   2          else
+  32   2          {
+  33   3            uart_sw_tx_low();
+  34   3          }
+  35   2          timer2_delay_us(BAUDRATE);
+  36   2          TxData >>= 1;
+  37   2        }
+  38   1        uart_sw_tx_high();
+  39   1        timer2_delay_us(BAUDRATE);
+  40   1      }
+  41          
+  42          
+  43          void uart_sw_send_string(unsigned char *TxData, unsigned long length)
+  44          {
+  45   1        uint32_t temp = 0;
+  46   1      
+  47   1        for(temp = 0; temp < length; temp ++)
+  48   1        {
+  49   2          uart_sw_send_byte(TxData[temp]);
+  50   2          timer2_delay_us(DELAY_FRAME);
+  51   2        }
+  52   1      }
+C51 COMPILER V9.60.7.0   LIBRARY_DEBUG                                                     03/20/2024 16:16:52 PAGE 2   
+
+  53          
+  54          
+  55          void uart_sw_send_number(unsigned long number)
+  56          {
+  57   1        uint8_t temp = 0;
+  58   1      
+  59   1        temp = number / 1000;
+  60   1        uart_sw_send_byte(temp + 48);
+  61   1        timer2_delay_us(DELAY_FRAME);
+  62   1      
+  63   1        temp = number % 1000 / 100;
+  64   1        uart_sw_send_byte(temp + 48);
+  65   1        timer2_delay_us(DELAY_FRAME);
+  66   1      
+  67   1        temp = number % 100 / 10;
+  68   1        uart_sw_send_byte(temp + 48);
+  69   1        timer2_delay_us(DELAY_FRAME);
+  70   1      
+  71   1        temp = number % 10;
+  72   1        uart_sw_send_byte(temp + 48);
+  73   1        timer2_delay_us(DELAY_FRAME);
+  74   1      }
+  75          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    420    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      17
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

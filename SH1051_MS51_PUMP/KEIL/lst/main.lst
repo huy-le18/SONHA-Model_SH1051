@@ -1,0 +1,705 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              04/16/2024 14:12:55 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Output\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE ..\main.c LARGE OMF2 OPTIMIZE(7,SPEED) BROWSE INCDIR(..\driver;..\driver
+                    -\driver_debug\inc;..\library\library_app\inc;..\library\library_debug\inc;..\driver\driver_app\inc;..\library\library_i2
+                    -c\inc) DEBUG PRINT(.\lst\main.lst) TABS(2) OBJECT(.\Output\main.obj)
+
+line level    source
+
+   1          /*--------------------------------------------------------------------------------------------------------
+             --*/
+   2          /*                                                                                                        
+             - */
+   3          /* SPDX-License-Identifier: Apache-2.0                                                                    
+             - */
+   4          /* Copyright(c) 2020 Nuvoton Technology Corp. All rights reserved.                                        
+             - */
+   5          /*                                                                                                        
+             - */
+   6          /*--------------------------------------------------------------------------------------------------------
+             --*/
+   7          #include "main.h"
+   8          
+   9          #define CYCLE_FOR_ELCB                15
+  10          #define CYCLE_FOR_RESET_ELCB          10
+  11          #define FLAG_WRITE          0
+  12          #define FLAG_READ           1
+  13          
+  14          // define error send from master
+  15          #define CONNECT_UI_BOARD_ERR_BIT 0
+  16          #define OUT_TEMP_HIGHT_ERR_BIT 1
+  17          #define FLOW_LOW_ERR_BIT 2
+  18          #define TESTING_CB_NOTIFY_BIT 3
+  19          #define ADC_OUTPUT_ERR_BIT 4
+  20          #define ADC_INPUT_ERR_BIT 5
+  21          #define PUMP_STATUS_BIT 6
+  22          
+  23          #define MAX_FLOW_SAMPLE   5
+  24          #define MAX_TIN_SAMPLE    14
+  25          
+  26          unsigned int FULSE_Tset_to_55[MAX_TIN_SAMPLE][5] = 
+  27          {
+  28          //   23   28   33   38   43
+  29            {205, 270 ,290, 330, 350},   // 16
+  30            {200, 246 ,275, 325, 360},   // 18
+  31            {195, 236 ,263, 315, 350},   // 20
+  32            {175, 230 ,260, 290, 320},   // 22
+  33            {160, 210 ,240, 270, 310},   // 24
+  34            {150, 190 ,230, 270, 310},   // 26
+  35          //  {140, 160 ,200, 220, 260},   // 28
+  36            {140, 175 ,210, 240, 280},   // 28
+  37            {130, 160 ,190, 210, 250},   // 30
+  38            {115, 145 ,180, 205, 240},   // 32
+  39            {110, 135 ,170, 190, 220},   // 34
+  40            {100, 120 ,150, 170, 190},   // 36
+  41            {85 , 110 ,130, 150, 170},   // 38
+  42            {65 , 95  ,115, 125, 140},   // 40
+  43            {50 , 75  ,95 , 115, 135}    // 42
+  44          };
+  45          
+  46          unsigned char Flow_sample_arr[5] = {23, 28, 33, 38, 43};
+  47          unsigned char Tin_sample_arr[MAX_TIN_SAMPLE] = {16,18,20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42};
+C51 COMPILER V9.60.7.0   MAIN                                                              04/16/2024 14:12:55 PAGE 2   
+
+  48          
+  49          unsigned char Flow_sample_index_l;  // luu chi so thap
+  50          unsigned char Flow_sample_index_h;  // luu chi so cao
+  51          
+  52          unsigned char Tin = 23;
+  53          unsigned char Flow_in = 26;
+  54          unsigned char Tset = 40;
+  55          
+  56          float F1, F2, F3, F4, F;
+  57          unsigned int fulse;
+  58          unsigned char delta_t_h;
+  59          unsigned char delta_t_l;
+  60          unsigned char i = 0;
+  61          
+  62          volatile bit b_boost;
+  63          
+  64          unsigned char u8_flag2msInTest = 0, u8_flag10msInTest = 0, u8_flag100msInTest = 0, u8_flag500msInTest = 0;
+  65          unsigned char u8_flag2msInPower = 0, u8_flag10msInPower = 0, u8_flag100msInPower = 0, u8_flag500msInPower 
+             -= 0;
+  66          unsigned char u8_flag2msInPowerOnErr = 0, u8_flag10msInPowerOnErr = 0, u8_flag100msInPowerOnErr = 0, u8_fl
+             -ag500msInPowerOnErr = 0;
+  67          unsigned int g_u16CounterFlow = 0;
+  68          unsigned int g_adcNtcIn = 0;
+  69          unsigned int g_adcNtcOut = 0;
+  70          unsigned char u8_elcbCounter = 0;
+  71          unsigned char u8_restElcbCounter = 0;
+  72          extern volatile unsigned char u8_value;
+  73          extern volatile bit b_i2c_read_write;
+  74          extern volatile bit b_flag_i2c_receive;
+  75          extern volatile bit b_flag_i2c_transmit;
+  76          extern volatile uint8_t u8_i2c_time_out;
+  77          
+  78          extern volatile bit b_pump_on;
+  79          
+  80          
+  81          volatile uint8_t machine_state = 0;
+  82          //powerMode_t g_powerMode = POWER_MODE_OFF;
+  83          
+  84          DeviceMode_t deviceMode = DEVICE_MODE_POWER;
+  85          DeviceModePower_t deviceModePower = DEVICE_MODE_POWER_OFF;
+  86          DeviceModePowerOn_t deviceModePowerOn = DEVICE_MODE_POWER_ON_NORMAL; 
+  87          
+  88          bit b_pump_on = 0;
+  89          
+  90          volatile uint8_t cnt_clk = 0;
+  91          volatile uint8_t data_rx;
+  92          volatile uint8_t m_tx_data[3];
+  93          volatile uint8_t m_rx_data[3];
+  94          volatile uint8_t temp_out;
+  95          volatile uint8_t temp_in;
+  96          volatile uint8_t temp_set;
+  97          volatile unsigned char data_handle[2];
+  98          
+  99          //volatile bit b_last_state = 1;
+ 100          //volatile bit b_state = 0;
+ 101          //volatile bit b_data = 0;
+ 102          //volatile bit b_test = 0;
+ 103          //volatile bit b_reset = 0;
+ 104          //volatile bit b_cg_in_mode_test = 0;
+ 105          //volatile bit b_cg_in_mode_power = 0;
+ 106          
+ 107          volatile bit b_test_cg;   // test chong giat
+C51 COMPILER V9.60.7.0   MAIN                                                              04/16/2024 14:12:55 PAGE 3   
+
+ 108          volatile bit b_reset_cg;  // reset chong giat
+ 109          volatile uint8_t test_cg_cnt;
+ 110          volatile uint8_t reset_cg_cnt;
+ 111          
+ 112          
+ 113          uint8_t datas;
+ 114          
+ 115          void main(void) {
+ 116   1        uart_sw_init();
+ 117   1        task_init();
+ 118   1        flow_counter_init();
+ 119   1        ntc_in_adc_init();
+ 120   1        ntc_out_adc_init();
+ 121   1        ntc_in_select_channel();
+ 122   1        
+ 123   1        lo_output_init();
+ 124   1        reset_lo_output_init();
+ 125   1        int_os_input_init();
+ 126   1        ctr_outac_output_init();
+ 127   1        ctr_triac_output_init();
+ 128   1        ctr_pump_output_init();
+ 129   1        
+ 130   1        lo_write_low();
+ 131   1        reset_lo_write_low();
+ 132   1        ctr_outac_write_low();
+ 133   1      //  ctr_triac_write_low();
+ 134   1        ctr_triac_write_high();
+ 135   1        ctr_pump_write_low();
+ 136   1        
+ 137   1        i2c_init_interrupt();
+ 138   1        gpio_interrupt_init();
+ 139   1        
+ 140   1        uart_sw_send_string("le danh huy", 13);
+ 141   1        
+ 142   1        
+ 143   1        while (1) 
+ 144   1        {
+ 145   2          
+ 146   2          if(u8_flag_200us == 1)
+ 147   2          {
+ 148   3            u8_flag_200us = 0;
+ 149   3          }
+ 150   2          if(u8_flag_1ms == 1)
+ 151   2          {
+ 152   3            u8_flag_1ms = 0;
+ 153   3          }
+ 154   2          if(u8_flag_2ms == 1)
+ 155   2          {
+ 156   3            u8_flag_2ms = 0;
+ 157   3            
+ 158   3            
+ 159   3            /*check flag adc*/
+ 160   3            if(u8_flag_adc == 1)
+ 161   3            {
+ 162   4              u8_flag_adc = 0;
+ 163   4              
+ 164   4              switch (adc_get_ntc_in_or_ntc_out())
+ 165   4              {
+ 166   5                case ADC_CHANNEL_NTC_IN:
+ 167   5                  g_adcNtcIn = convert12BitsTo10Bit(u16_adc_value);
+ 168   5                  ntc_out_select_channel();
+ 169   5                  break;
+C51 COMPILER V9.60.7.0   MAIN                                                              04/16/2024 14:12:55 PAGE 4   
+
+ 170   5                case ADC_CHANNEL_NTC_OUT:
+ 171   5                  g_adcNtcOut = convert12BitsTo10Bit(u16_adc_value);
+ 172   5                  ntc_in_select_channel();
+ 173   5                  break;
+ 174   5                default:
+ 175   5                  break;
+ 176   5              }
+ 177   4              
+ 178   4              
+ 179   4            }
+ 180   3            
+ 181   3            if ((g_adcNtcIn > ADC_HIGH_LIMIT) || (g_adcNtcIn < ADC_LOW_LIMIT)) {
+ 182   4              machine_state |= (1 << ADC_INPUT_ERR_BIT);
+ 183   4      
+ 184   4            } else {
+ 185   4              machine_state &= ~(1 << ADC_INPUT_ERR_BIT);
+ 186   4            }
+ 187   3            
+ 188   3            
+ 189   3            if ((g_adcNtcOut > ADC_HIGH_LIMIT) || (g_adcNtcOut < ADC_LOW_LIMIT)) {
+ 190   4              machine_state |= (1 << ADC_OUTPUT_ERR_BIT);
+ 191   4      
+ 192   4            } else {
+ 193   4              machine_state &= ~(1 << ADC_OUTPUT_ERR_BIT);
+ 194   4            }
+ 195   3            
+ 196   3            
+ 197   3            if(g_adcNtcIn < 384) 
+ 198   3            {
+ 199   4              g_adcNtcIn = 384;
+ 200   4            }
+ 201   3            
+ 202   3            if(g_adcNtcOut < 384) 
+ 203   3            {
+ 204   4              g_adcNtcOut = 384;
+ 205   4            }
+ 206   3            /*handle temperature*/
+ 207   3            getTempFromTable((uint16_t)g_adcNtcIn, &temp_in);
+ 208   3            getTempFromTable((uint16_t)g_adcNtcOut, &temp_out);
+ 209   3            
+ 210   3            
+ 211   3            if ((temp_out > TEMP_MIN_TO_PROTECT)) {
+ 212   4              machine_state |= (1 << OUT_TEMP_HIGHT_ERR_BIT);
+ 213   4      
+ 214   4            } else {
+ 215   4              machine_state &= ~(1 << OUT_TEMP_HIGHT_ERR_BIT);
+ 216   4            }
+ 217   3            
+ 218   3            
+ 219   3            /*process main programer*/
+ 220   3            switch (deviceMode)
+ 221   3            {
+ 222   4              case DEVICE_MODE_START:
+ 223   4      
+ 224   4                break;
+ 225   4              case DEVICE_MODE_TEST:
+ 226   4                if(int_os_read_state() == 0)
+ 227   4                {
+ 228   5                  ctr_outac_write_low();
+ 229   5                  ctr_pump_write_low();
+ 230   5                  machine_state &= ~(1 << PUMP_STATUS_BIT);
+ 231   5                  b_pump_on = 0;
+C51 COMPILER V9.60.7.0   MAIN                                                              04/16/2024 14:12:55 PAGE 5   
+
+ 232   5                  
+ 233   5                  
+ 234   5                  machine_state |= (1 << TESTING_CB_NOTIFY_BIT);
+ 235   5      //            b_cg_in_mode_test = 1;
+ 236   5                }
+ 237   4                else
+ 238   4                {
+ 239   5                  machine_state &= ~(1 << TESTING_CB_NOTIFY_BIT);
+ 240   5      //            b_cg_in_mode_test = 0;
+ 241   5                }
+ 242   4                break;
+ 243   4              case DEVICE_MODE_POWER:
+ 244   4      
+ 245   4                if(int_os_read_state() == 0)
+ 246   4                {
+ 247   5                  ctr_outac_write_low();
+ 248   5                  fulse = 0;
+ 249   5                  u16NumActive = 0;
+ 250   5                  num_active_pulse = 0;
+ 251   5                  num_addition = 0;
+ 252   5                  
+ 253   5      //            ctr_pump_write_low();
+ 254   5      //            machine_state &= ~(1 << PUMP_STATUS_BIT);
+ 255   5      //            b_pump_on = 0;
+ 256   5                  
+ 257   5                  machine_state |= (1 << TESTING_CB_NOTIFY_BIT);
+ 258   5      //            b_cg_in_mode_power = 1;
+ 259   5                  
+ 260   5                  
+ 261   5                }
+ 262   4                else
+ 263   4                {
+ 264   5                  machine_state &= ~(1 << TESTING_CB_NOTIFY_BIT);
+ 265   5      //            b_cg_in_mode_power = 0;
+ 266   5                }
+ 267   4                break;
+ 268   4            }
+ 269   3          }
+ 270   2          
+ 271   2          if(u8_flag_10ms == 1)
+ 272   2          {
+ 273   3            u8_flag_10ms = 0;
+ 274   3            
+ 275   3            if(b_flag_i2c_receive == 1)
+ 276   3            {
+ 277   4              if(m_rx_data[2] == CRC8(m_rx_data, 2))
+ 278   4              {
+ 279   5                data_handle[0] = m_rx_data[0];
+ 280   5                data_handle[1] = m_rx_data[1];
+ 281   5                 
+ 282   5                temp_set = data_handle[1];
+ 283   5                if(data_handle[0] & (1 << CMD_TEST_BIT))
+ 284   5                {
+ 285   6              
+ 286   6                  deviceMode = DEVICE_MODE_TEST;
+ 287   6                  b_test_cg = 1;
+ 288   6                  
+ 289   6                  ctr_outac_write_low();
+ 290   6                  
+ 291   6                }
+ 292   5                
+ 293   5                if(data_handle[0] & (1 << CMD_RESET_BIT))
+C51 COMPILER V9.60.7.0   MAIN                                                              04/16/2024 14:12:55 PAGE 6   
+
+ 294   5                {
+ 295   6                  deviceMode = DEVICE_MODE_POWER;
+ 296   6                  b_reset_cg = 1;
+ 297   6      
+ 298   6                }
+ 299   5                
+ 300   5                if(data_handle[0] & (1 << PUMP_ON_CMD))
+ 301   5                {
+ 302   6                  ctr_pump_write_high();
+ 303   6                  machine_state |= (1 << PUMP_STATUS_BIT);
+ 304   6                }
+ 305   5                
+ 306   5                if(data_handle[0] & (1 << PUMP_OFF_CMD))
+ 307   5                {
+ 308   6                  ctr_pump_write_low();
+ 309   6                  machine_state &= ~(1 << PUMP_STATUS_BIT);
+ 310   6                }
+ 311   5                
+ 312   5                
+ 313   5                if(temp_set == 0)
+ 314   5                {
+ 315   6                  deviceModePower = DEVICE_MODE_POWER_OFF;
+ 316   6                }
+ 317   5                else if(temp_set > 0)
+ 318   5                {
+ 319   6                  deviceModePower = DEVICE_MODE_POWER_ON;
+ 320   6                }
+ 321   5      
+ 322   5                b_flag_i2c_receive = 0;
+ 323   5              }
+ 324   4            
+ 325   4            }
+ 326   3            
+ 327   3            
+ 328   3            switch (deviceMode)
+ 329   3            {
+ 330   4              case DEVICE_MODE_START:
+ 331   4      
+ 332   4                break;
+ 333   4              case DEVICE_MODE_TEST:
+ 334   4                
+ 335   4                fulse = 0;
+ 336   4                u16NumActive = 0;
+ 337   4                num_active_pulse = 0;
+ 338   4                num_addition = 0;
+ 339   4              
+ 340   4                ctr_outac_write_low();
+ 341   4                
+ 342   4                
+ 343   4                break;
+ 344   4              case DEVICE_MODE_POWER:
+ 345   4                
+ 346   4                break;
+ 347   4            }
+ 348   3            
+ 349   3            /*check button press*/
+ 350   3          }
+ 351   2          
+ 352   2          if(u8_flag_50ms == 1)
+ 353   2          {
+ 354   3            u8_flag_50ms = 0;
+ 355   3            
+C51 COMPILER V9.60.7.0   MAIN                                                              04/16/2024 14:12:55 PAGE 7   
+
+ 356   3            if(b_i2c_read_write == FLAG_WRITE)
+ 357   3            {
+ 358   4              m_tx_data[0] = machine_state;
+ 359   4              m_tx_data[1] = temp_out;
+ 360   4              m_tx_data[2] = CRC8(m_tx_data, 2);  
+ 361   4              i2c_master_write();
+ 362   4            }
+ 363   3            else if (b_i2c_read_write == FLAG_READ)
+ 364   3            {
+ 365   4              i2c_master_read();
+ 366   4            }
+ 367   3            I2C_SET_START();
+ 368   3            I2C_CLEAR_SI();
+ 369   3          }
+ 370   2          
+ 371   2      //    if(u8_flag_100ms == 1)
+ 372   2      //    {
+ 373   2      //      u8_flag_100ms = 0;
+ 374   2      //    }
+ 375   2          
+ 376   2          if(u8_flag_200ms == 1)
+ 377   2          {
+ 378   3            u8_flag_200ms = 0;
+ 379   3        
+ 380   3      //      uart_sw_send_number(data_handle[0]);
+ 381   3      //      uart_sw_send_byte('\n');
+ 382   3            
+ 383   3            switch (deviceMode)
+ 384   3            {
+ 385   4              case DEVICE_MODE_START:
+ 386   4      
+ 387   4                break;
+ 388   4              case DEVICE_MODE_TEST:
+ 389   4                
+ 390   4                break;
+ 391   4              case DEVICE_MODE_POWER:
+ 392   4                
+ 393   4                switch (deviceModePower)
+ 394   4                {
+ 395   5                  case DEVICE_MODE_POWER_OFF:
+ 396   5                    
+ 397   5                  
+ 398   5                    fulse = 0;
+ 399   5                    u16NumActive = 0;
+ 400   5                    num_active_pulse = 0;
+ 401   5                    num_addition = 0;
+ 402   5                    ctr_outac_write_low();
+ 403   5                  
+ 404   5                  
+ 405   5                    break;
+ 406   5                  case DEVICE_MODE_POWER_ON:
+ 407   5            
+ 408   5                    if(machine_state & (1 << OUT_TEMP_HIGHT_ERR_BIT)
+ 409   5                      || machine_state & (1 << FLOW_LOW_ERR_BIT)
+ 410   5                      || machine_state & (1 << TESTING_CB_NOTIFY_BIT)
+ 411   5                      || machine_state & (1 << ADC_OUTPUT_ERR_BIT)
+ 412   5                      || machine_state & (1 << ADC_INPUT_ERR_BIT))
+ 413   5                    {
+ 414   6                      deviceModePowerOn = DEVICE_MODE_POWER_ON_ERR;
+ 415   6                    }
+ 416   5                    else
+ 417   5                    {
+C51 COMPILER V9.60.7.0   MAIN                                                              04/16/2024 14:12:55 PAGE 8   
+
+ 418   6                      deviceModePowerOn = DEVICE_MODE_POWER_ON_NORMAL;
+ 419   6                    }
+ 420   5                  
+ 421   5                    switch (deviceModePowerOn)
+ 422   5                    {
+ 423   6                      case DEVICE_MODE_POWER_ON_NORMAL:
+ 424   6                        if(int_os_read_state() == 0)
+ 425   6                        {
+ 426   7                          ctr_outac_write_low();
+ 427   7                          fulse = 0;
+ 428   7                          u16NumActive = 0;
+ 429   7                          num_active_pulse = 0;
+ 430   7                          num_addition = 0;
+ 431   7                        
+ 432   7                          machine_state |= (1 << TESTING_CB_NOTIFY_BIT);
+ 433   7      //                    b_cg_in_mode_power = 1;
+ 434   7                          
+ 435   7                        }
+ 436   6                        else
+ 437   6                        {
+ 438   7                          ctr_outac_write_high();
+ 439   7                          machine_state &= ~(1 << TESTING_CB_NOTIFY_BIT);
+ 440   7      //                    b_cg_in_mode_power = 0;
+ 441   7                          mode_power_on_normal_program();
+ 442   7                        }
+ 443   6                        
+ 444   6                        break;
+ 445   6                      case DEVICE_MODE_POWER_ON_ERR:
+ 446   6                        fulse = 0;
+ 447   6                        u16NumActive = 0;
+ 448   6                        num_active_pulse = 0;
+ 449   6                        num_addition = 0;
+ 450   6                        ctr_outac_write_low();
+ 451   6                        
+ 452   6                        break;
+ 453   6                    }
+ 454   5                    
+ 455   5                    break;
+ 456   5                }
+ 457   4            
+ 458   4                break;
+ 459   4            }
+ 460   3            
+ 461   3          }
+ 462   2      //    if(u8_flag_500ms == 1)
+ 463   2      //    {
+ 464   2      //      u8_flag_500ms = 0;
+ 465   2      //      
+ 466   2      //      uart_sw_send_byte('\n');
+ 467   2      //      uart_sw_send_number(u16NumActive);
+ 468   2      //      uart_sw_send_byte('\n');
+ 469   2      ////      u8_detect_zero = 0;
+ 470   2      //      uart_sw_send_number(num_active_pulse);
+ 471   2      //      uart_sw_send_byte('\n');
+ 472   2      //      
+ 473   2      //      uart_sw_send_number(num_addition);
+ 474   2      //      uart_sw_send_byte('\n');
+ 475   2      //    }
+ 476   2          if(u8_flag_1s == 1)
+ 477   2          {
+ 478   3            u8_flag_1s = 0;
+ 479   3            
+C51 COMPILER V9.60.7.0   MAIN                                                              04/16/2024 14:12:55 PAGE 9   
+
+ 480   3            g_u16CounterFlow = flow_counter_read();
+ 481   3      //        g_u16CounterFlow = 30;
+ 482   3            flow_counter_reset();
+ 483   3            
+ 484   3            if(g_u16CounterFlow < FLOW_MIN_TO_PROTECT)
+ 485   3            {
+ 486   4              machine_state |= (1 << FLOW_LOW_ERR_BIT);
+ 487   4            }
+ 488   3            else
+ 489   3            {
+ 490   4              machine_state &= ~(1 << FLOW_LOW_ERR_BIT);
+ 491   4            }
+ 492   3            
+ 493   3      //      if(int_os_read_state() == 0)
+ 494   3      //      {
+ 495   3      //        uart_sw_send_string("co", 2);
+ 496   3      //        uart_sw_send_byte('\n');
+ 497   3      //      }
+ 498   3      //      else
+ 499   3      //      {
+ 500   3      //        uart_sw_send_string("khong", 5);
+ 501   3      //        uart_sw_send_byte('\n');
+ 502   3      //      }
+ 503   3            
+ 504   3      //      uart_sw_send_byte('\n');
+ 505   3      //      machine_state
+ 506   3      //      uart_sw_send_number(machine_state);
+ 507   3      //      uart_sw_send_byte('\n');
+ 508   3      //      
+ 509   3            uart_sw_send_number(data_handle[0]);
+ 510   3            uart_sw_send_byte('\n');
+ 511   3            uart_sw_send_number(data_handle[1]);
+ 512   3            uart_sw_send_byte('\n');
+ 513   3            uart_sw_send_number(m_rx_data[2]);
+ 514   3            uart_sw_send_byte('\n');
+ 515   3            uart_sw_send_byte('\n');
+ 516   3      
+ 517   3      //      uart_sw_send_string("NtcI:",5);
+ 518   3      //      uart_sw_send_number(g_adcNtcIn);
+ 519   3      //      uart_sw_send_byte('\n');
+ 520   3      //      uart_sw_send_string("NtcO:",5);
+ 521   3      //      uart_sw_send_number(g_adcNtcOut);
+ 522   3      //      uart_sw_send_byte('\n');
+ 523   3      //      uart_sw_send_number(g_u16CounterFlow);
+ 524   3      //      uart_sw_send_byte('\n');
+ 525   3      //      
+ 526   3      //      uart_sw_send_string("tempi:",6);
+ 527   3      //      uart_sw_send_number(temp_in);
+ 528   3      //      uart_sw_send_byte('\n');
+ 529   3      //      uart_sw_send_string("tempo:",6);
+ 530   3      //      uart_sw_send_number(temp_out);
+ 531   3      //      uart_sw_send_byte('\n');
+ 532   3      //      uart_sw_send_string("temps:",6);
+ 533   3      //      uart_sw_send_number(temp_set);
+ 534   3      //      uart_sw_send_byte('\n');
+ 535   3      //      uart_sw_send_number(u16NumActive);
+ 536   3      //      uart_sw_send_byte('\n');
+ 537   3      //      uart_sw_send_byte('\n');
+ 538   3      //      uart_sw_send_string("ntc:",4);
+ 539   3      //      uart_sw_send_number(g_adcNtcValue);
+ 540   3      //      uart_sw_send_byte('\n');
+ 541   3      //      uart_sw_send_string("knob:",5);
+C51 COMPILER V9.60.7.0   MAIN                                                              04/16/2024 14:12:55 PAGE 10  
+
+ 542   3      //      uart_sw_send_number(g_adcKnobValue);
+ 543   3      //      uart_sw_send_byte('\n');
+ 544   3      //      uart_sw_send_string("mode:",5);
+ 545   3      //      uart_sw_send_number(g_powerMode);
+ 546   3      //      uart_sw_send_byte('\n');
+ 547   3          }
+ 548   2          if(u8_flag_2s == 1)
+ 549   2          {
+ 550   3            u8_flag_2s = 0;
+ 551   3          }
+ 552   2        }
+ 553   1      }
+ 554          
+ 555          
+ 556          void mode_power_on_normal_program(void)
+ 557          {
+ 558   1              // calculate raw active pulse
+ 559   1            if (temp_set > 0) {
+ 560   2              /* Compute new control signal */
+ 561   2      
+ 562   2              Flow_in = g_u16CounterFlow;
+ 563   2              Tin = temp_in;
+ 564   2              
+ 565   2              for (i = 0; i < 5; i++) {
+ 566   3                if (Flow_in < Flow_sample_arr[0]) {
+ 567   4                  break;
+ 568   4                } else if ((Flow_in >= Flow_sample_arr[i]) && (Flow_in < Flow_sample_arr[i + 1])) {
+ 569   4                  Flow_sample_index_l = i;
+ 570   4                  Flow_sample_index_h = i + 1;
+ 571   4                  break;
+ 572   4                } else if ((Flow_in >= Flow_sample_arr[4])) {
+ 573   4                  Flow_sample_index_l = 3;
+ 574   4                  Flow_sample_index_h = 4;
+ 575   4                }
+ 576   3              }
+ 577   2      
+ 578   2              for (i = 0; i < MAX_TIN_SAMPLE; i++) {
+ 579   3                if (Tin < Tin_sample_arr[0]) {
+ 580   4                  F1 = FULSE_Tset_to_55[0][Flow_sample_index_l];
+ 581   4                  F2 = FULSE_Tset_to_55[0][Flow_sample_index_h];
+ 582   4                  break;
+ 583   4                } else if ((Tin >= Tin_sample_arr[i]) && (Tin < Tin_sample_arr[i + 1])) {
+ 584   4                  delta_t_l = FULSE_Tset_to_55[i][Flow_sample_index_l] - FULSE_Tset_to_55[i + 1][Flow_sample_ind
+             -ex_l];
+ 585   4      
+ 586   4                  delta_t_h = FULSE_Tset_to_55[i][Flow_sample_index_h] - FULSE_Tset_to_55[i + 1][Flow_sample_ind
+             -ex_h];
+ 587   4      
+ 588   4                  F1 = FULSE_Tset_to_55[i][Flow_sample_index_l] - (Tin - Tin_sample_arr[i]) * delta_t_l / 2.0;
+ 589   4      
+ 590   4                  F2 = FULSE_Tset_to_55[i][Flow_sample_index_h] - (Tin - Tin_sample_arr[i]) * delta_t_h / 2.0;
+ 591   4      
+ 592   4                  break;
+ 593   4                } else if ((Tin >= Tin_sample_arr[MAX_TIN_SAMPLE - 1])) {
+ 594   4                  F1 = FULSE_Tset_to_55[MAX_TIN_SAMPLE - 1][Flow_sample_index_l];
+ 595   4                  F2 = FULSE_Tset_to_55[MAX_TIN_SAMPLE - 1][Flow_sample_index_h];
+ 596   4                }
+ 597   3              }
+ 598   2      
+ 599   2              F4 = F1 - (F1 - F2) * (Flow_in - Flow_sample_arr[Flow_sample_index_l]) / 5.0;
+ 600   2              F = (temp_set - Tin) * F4 * 10 / (55 - Tin);
+ 601   2              if ((int)F % 10 >= 5) {
+C51 COMPILER V9.60.7.0   MAIN                                                              04/16/2024 14:12:55 PAGE 11  
+
+ 602   3                fulse = F / 10 + 1;
+ 603   3              } else {
+ 604   3                fulse = F / 10;
+ 605   3              }
+ 606   2      
+ 607   2              if (temp_set > temp_in) {
+ 608   3                u16NumActive = fulse;
+ 609   3              } else
+ 610   2                u16NumActive = 0;
+ 611   2      
+ 612   2              if ((temp_out > temp_set)) {
+ 613   3                u16NumActive = u16NumActive * 9 / 10;
+ 614   3              }
+ 615   2              if ((temp_out < temp_set)) {
+ 616   3                if (temp_out < temp_set - 12) {
+ 617   4                  b_boost = 1;  
+ 618   4                }
+ 619   3                if (temp_out < temp_set - 6) {
+ 620   4                  if (b_boost == 1) u16NumActive = u16NumActive * 14 / 10;
+ 621   4                } else if (temp_out < temp_set - 1) {
+ 622   4                  if (b_boost == 1) u16NumActive = u16NumActive * 12 / 10;
+ 623   4                } else {
+ 624   4                  b_boost = 0;
+ 625   4                  u16NumActive = u16NumActive * 11 / 10;
+ 626   4                }
+ 627   3              }
+ 628   2      
+ 629   2              if (u16NumActive > 200) u16NumActive = 200;
+ 630   2              
+ 631   2              num_active_pulse = u16NumActive / 10;
+ 632   2              num_addition = u16NumActive - (num_active_pulse * 10);
+ 633   2      
+ 634   2              if (num_active_pulse > 20) {
+ 635   3                num_active_pulse = 20;
+ 636   3                num_addition = 0;
+ 637   3              }
+ 638   2            } else {
+ 639   2              u16NumActive = 0;
+ 640   2              num_active_pulse = 0;
+ 641   2              num_addition = 0;
+ 642   2            }
+ 643   1      }
+ 644          
+ 645          
+ 646          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   2414    ----
+   CONSTANT SIZE    =     12    ----
+   XDATA SIZE       =    229    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      4    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

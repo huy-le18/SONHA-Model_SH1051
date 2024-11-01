@@ -1,0 +1,282 @@
+C51 COMPILER V9.60.7.0   LIBRARY_APP                                                       04/10/2024 10:38:34 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE LIBRARY_APP
+OBJECT MODULE PLACED IN .\Output\library_app.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE ..\library\library_app\src\library_app.c LARGE OMF2 OPTIMIZE(7,SPEED) BR
+                    -OWSE INCDIR(..\driver;..\driver\driver_debug\inc;..\library\library_app\inc;..\library\library_debug\inc;..\driver\drive
+                    -r_app\inc;..\library\library_i2c\inc) DEBUG PRINT(.\lst\library_app.lst) TABS(2) OBJECT(.\Output\library_app.obj)
+
+line level    source
+
+   1          #include "driver_app.h"
+   2          #include "library_app.h"
+   3          #include "library_debug.h"
+   4          #include "ms51_16k.h"
+   5          /***************for task**************/
+   6          
+   7          const unsigned int tempArray[56] = {
+   8            851,  // 10 degree
+   9            844,
+  10            837,
+  11            830,
+  12            822,
+  13            814,
+  14            807,
+  15            799,
+  16            790,
+  17            782,
+  18            774,
+  19            765,
+  20            756,
+  21            747,
+  22            738,
+  23            731,
+  24            723,
+  25            714,
+  26            704,
+  27            695,
+  28            685,
+  29            675,
+  30            666,
+  31            656,
+  32            646,
+  33            636,  // 35
+  34            626,
+  35            616,
+  36            606,
+  37            595,
+  38            585,  // 40
+  39            575,
+  40            565,
+  41            555,
+  42            545,
+  43            535,
+  44            525,
+  45            515,
+  46            505,
+  47            495,
+  48            485,
+  49            475,
+  50            466,
+  51            456,
+  52            447,
+  53            437,  // 55 degree
+C51 COMPILER V9.60.7.0   LIBRARY_APP                                                       04/10/2024 10:38:34 PAGE 2   
+
+  54            428,
+  55            419,
+  56            410,
+  57            401,
+  58            392,  // 60 degree
+  59            384,
+  60            375,
+  61            367,
+  62            358,
+  63            350,  // 65 degree
+  64          };
+  65          
+  66          
+  67          void task_init(void)
+  68          {
+  69   1        timer3_init_for_task(200);
+  70   1      }
+  71          
+  72          /***************for flow**************/
+  73          void flow_counter_init(void)
+  74          {
+  75   1        timer1_counter_init();
+  76   1      }
+  77          unsigned int flow_counter_read(void)
+  78          {
+  79   1        return timer1_counter_read();
+  80   1      }
+  81          void flow_counter_reset(void)
+  82          {
+  83   1        timer1_counter_reset();
+  84   1      }
+  85          
+  86          void detect_zero_init(void)
+  87          {
+  88   1        gpio_interrupt_init();
+  89   1      }
+  90          /***************for adc**************/
+  91          void ntc_in_adc_init(void)
+  92          {
+  93   1        adc_init();
+  94   1      }
+  95          unsigned int ntc_in_adc_read(void)
+  96          {
+  97   1        return adc_read();
+  98   1      }
+  99          
+ 100          void ntc_in_select_channel(void)
+ 101          {
+ 102   1        adc_select_channel(ADC_CHANNEL_NTC_IN);
+ 103   1        adc_start();
+ 104   1      }
+ 105          
+ 106          ADC_CHANNEL_t adc_get_ntc_in_or_ntc_out(void)
+ 107          {
+ 108   1        return adc_get_channel();
+ 109   1      }
+ 110          
+ 111          
+ 112          void ntc_out_adc_init(void)
+ 113          {
+ 114   1        adc_init();
+ 115   1      }
+C51 COMPILER V9.60.7.0   LIBRARY_APP                                                       04/10/2024 10:38:34 PAGE 3   
+
+ 116          unsigned int ntc_out_adc_read(void)
+ 117          {
+ 118   1        return adc_read();
+ 119   1      }
+ 120          void ntc_out_select_channel(void)
+ 121          {
+ 122   1        adc_select_channel(ADC_CHANNEL_NTC_OUT);
+ 123   1        adc_start();
+ 124   1      }
+ 125          
+ 126          /***************for gpio**************/
+ 127          
+ 128          //#define INT_OS_PIN            P04
+ 129          //#define RESET_LO_PIN          P11
+ 130          //#define LO_PIN                P12
+ 131          
+ 132          //#define CTR_OUTAC_PIN         P03
+ 133          //#define CTR_TRIAC_PIN         P17
+ 134          //#define CTR_PUMP_PIN          P05
+ 135          
+ 136          //#define SCL_PIN               P13
+ 137          //#define SDA_PIN               P14
+ 138          
+ 139          void lo_output_init(void)
+ 140          {
+ 141   1        P12_PUSHPULL_MODE;
+ 142   1      }
+ 143          void lo_write_high(void)
+ 144          {
+ 145   1        LO_PIN = 1; 
+ 146   1      }
+ 147          void lo_write_low(void)
+ 148          {
+ 149   1        LO_PIN = 0;
+ 150   1      }
+ 151          void lo_write_tonggle(void)
+ 152          {
+ 153   1        LO_PIN = !LO_PIN;
+ 154   1      }
+ 155          
+ 156          
+ 157          void int_os_input_init(void)
+ 158          {
+ 159   1        P04_INPUT_MODE;
+ 160   1      }
+ 161          
+ 162          bit int_os_read_state(void)
+ 163          {
+ 164   1        return INT_OS_PIN;
+ 165   1      }
+ 166          
+ 167          void reset_lo_output_init(void)
+ 168          {
+ 169   1        P11_PUSHPULL_MODE;
+ 170   1      }
+ 171          void reset_lo_write_high(void)
+ 172          {
+ 173   1        RESET_LO_PIN = 1;
+ 174   1      }
+ 175          void reset_lo_write_low(void)
+ 176          {
+ 177   1        RESET_LO_PIN = 0;
+C51 COMPILER V9.60.7.0   LIBRARY_APP                                                       04/10/2024 10:38:34 PAGE 4   
+
+ 178   1      }
+ 179          
+ 180          void ctr_pump_output_init(void)
+ 181          {
+ 182   1        P05_PUSHPULL_MODE;
+ 183   1      }
+ 184          void ctr_pump_write_high(void)
+ 185          {
+ 186   1        CTR_PUMP_PIN = 1;
+ 187   1      }
+ 188          void ctr_pump_write_low(void)
+ 189          {
+ 190   1        CTR_PUMP_PIN = 0;
+ 191   1      }
+ 192          
+ 193          
+ 194          void ctr_triac_output_init(void)
+ 195          {
+ 196   1        P17_PUSHPULL_MODE;
+ 197   1      }
+ 198          void ctr_triac_write_high(void)
+ 199          {
+ 200   1        CTR_TRIAC_PIN = 1;
+ 201   1      }
+ 202          void ctr_triac_write_low(void)
+ 203          {
+ 204   1        CTR_TRIAC_PIN = 0;
+ 205   1      }
+ 206          
+ 207          void ctr_outac_output_init(void)
+ 208          {
+ 209   1        P03_PUSHPULL_MODE;
+ 210   1      }
+ 211          void ctr_outac_write_high(void)
+ 212          {
+ 213   1        CTR_OUTAC_PIN = 1;
+ 214   1      }
+ 215          void ctr_outac_write_low(void)
+ 216          {
+ 217   1        CTR_OUTAC_PIN = 0;
+ 218   1      }
+ 219          
+ 220          uint16_t convert12BitsTo10Bit(uint16_t value) {
+ 221   1        uint32_t temp = 0;
+ 222   1      
+ 223   1        temp = ((uint32_t)value * 1023) / 4095;
+ 224   1      
+ 225   1        return (uint16_t)temp;
+ 226   1      }
+ 227          
+ 228          uint8_t getTempFromTable(uint16_t ADTEMP, volatile uint8_t *temp) {
+ 229   1        uint8_t i;
+ 230   1      
+ 231   1        if ((ADTEMP > tempArray[0]) || (ADTEMP < tempArray[55])) {
+ 232   2          *temp = 0;
+ 233   2          return 0;
+ 234   2        }
+ 235   1      
+ 236   1        for (i = 1; i <= 55; i++) {
+ 237   2          if (tempArray[i] <= ADTEMP) {
+ 238   3            break;
+ 239   3          }
+C51 COMPILER V9.60.7.0   LIBRARY_APP                                                       04/10/2024 10:38:34 PAGE 5   
+
+ 240   2        }
+ 241   1      
+ 242   1        *temp = i + 10 /* - 1 */;
+ 243   1        return 1;
+ 244   1      }
+ 245          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    279    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =    112       3
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

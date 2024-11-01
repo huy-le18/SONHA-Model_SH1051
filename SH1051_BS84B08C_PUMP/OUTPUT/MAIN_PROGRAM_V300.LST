@@ -1,0 +1,3122 @@
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 1
+
+
+   1  0000              
+   2  0000              message '****************************************************************'
+   3  0000              message '*PROJECT NAME :MAIN PROGRAM                                    *'
+   4  0000              message '*     VERSION :V300                                            *'
+   5  0000              message '* ICE VERSION :                                                *'
+   6  0000              message '*      DATE   :20200930                                        *'
+   7  0000              message '****************************************************************'
+   8  0000                              PUBLIC  _DATA_BUF  
+   9  0000                              PUBLIC  _HALT_STATE
+  10  0000              
+  11  0000                              #define ESCfunctionIDcheck
+  12  0000              
+  13  0000                              ;==============
+  14  0000                              ;=DATA SETCTION
+  15  0000                              ;==============
+  16  0000              MAIN_DATA       .SECTION          'DATA'
+  17  0000  0008[       _DATA_BUF       DB      8 DUP(?)
+            00
+            ]
+  18  0008  00          _HALT_STATE     DB      ?      
+  19  0009              ifndef   ESCfunctionIDcheck
+  20  0009              _FUNCTION_ID    DB      ?
+  21  0009              endif
+  22  0009                               ;=INCLUDE REFERENCE FILE
+  23  0009                              INCLUDE MAIN_PROGRAM.INC
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  24  0001               
+  25  0001              
+  26  0001              .LISTMACRO
+  27  0001              EXECUTE         MACRO   FUNCTION,IDnumber,DefineName
+  28  0001                      ifdef   FUNCTION
+  29  0001                              ifndef DefineName
+  30  0001                                  #define DefineName
+  31  0001                              endif
+  32  0001                              
+  33  0001                              ifdef   PBP
+  34  0001                                  MOV     A,BANK FUNCTION
+  35  0001                                  MOV     PBP,A
+  36  0001                              endif
+  37  0001                                  ;-FUCNTION ID CHECK 
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 2
+
+  38  0001                              ifndef      ESCfunctionIDcheck
+  39  0001                                  if      IDnumber != 0
+  40  0001                                  MOV     A,IDnumber
+  41  0001                                  MOV     _FUNCTION_ID,A
+  42  0001                                  endif     
+  43  0001                              endif
+  44  0001                                  ;--------------- 
+  45  0001                                  CALL    FUNCTION
+  46  0001                                  ;---------------
+  47  0001                              ifndef      ESCfunctionIDcheck
+  48  0001                                  if      IDnumber != 0
+  49  0001                                  MOV     A,IDnumber
+  50  0001                                  XOR     A,_FUNCTION_ID
+  51  0001                                  SZ      ACC
+  52  0001                                  JMP     PROGRAM_RESET           ;PCL Abnormal
+  53  0001                                  endif
+  54  0001                              endif     
+  55  0001                                  ifdef   PBP
+  56  0001                                  MOV     A,BANK MAIN_LOOP
+  57  0001                                  MOV     PBP,A
+  58  0001                                  endif  
+  59  0001                      endif
+  60  0001                              ENDM
+  61  0001              
+  62  0001              
+  63  0001              EXTEND_FUNCTION_INITIAL MACRO
+  64  0001                              EXECUTE EXTEND_FUNCTION_1A_INITIAL,040H,DEF_INITIAL 
+  65  0001                              EXECUTE EXTEND_FUNCTION_1B_INITIAL,041H,DEF_INITIAL 
+  66  0001                              EXECUTE EXTEND_FUNCTION_1C_INITIAL,042H,DEF_INITIAL 
+  67  0001                              EXECUTE EXTEND_FUNCTION_1D_INITIAL,043H,DEF_INITIAL 
+  68  0001                              EXECUTE EXTEND_FUNCTION_1E_INITIAL,044H,DEF_INITIAL 
+  69  0001                              EXECUTE EXTEND_FUNCTION_1F_INITIAL,045H,DEF_INITIAL 
+  70  0001                              EXECUTE EXTEND_FUNCTION_1G_INITIAL,046H,DEF_INITIAL 
+  71  0001                              EXECUTE EXTEND_FUNCTION_1H_INITIAL,047H,DEF_INITIAL 
+  72  0001                              EXECUTE EXTEND_FUNCTION_2A_INITIAL,048H,DEF_INITIAL
+  73  0001                              EXECUTE EXTEND_FUNCTION_2B_INITIAL,049H,DEF_INITIAL
+  74  0001                              EXECUTE EXTEND_FUNCTION_2C_INITIAL,04AH,DEF_INITIAL
+  75  0001                              EXECUTE EXTEND_FUNCTION_2D_INITIAL,04BH,DEF_INITIAL
+  76  0001                              EXECUTE EXTEND_FUNCTION_2E_INITIAL,04CH,DEF_INITIAL
+  77  0001                              EXECUTE EXTEND_FUNCTION_2F_INITIAL,04DH,DEF_INITIAL
+  78  0001                              EXECUTE EXTEND_FUNCTION_2G_INITIAL,04EH,DEF_INITIAL
+  79  0001                              EXECUTE EXTEND_FUNCTION_2H_INITIAL,04FH,DEF_INITIAL
+  80  0001                              ENDM
+  81  0001              
+  82  0001              
+  83  0001              EXTEND_FUNCTION_WORK MACRO
+  84  0001                              EXECUTE EXTEND_FUNCTION_1A,050H,WORK
+  85  0001                              EXECUTE EXTEND_FUNCTION_1B,051H,WORK
+  86  0001                              EXECUTE EXTEND_FUNCTION_1C,052H,WORK
+  87  0001                              EXECUTE EXTEND_FUNCTION_1D,053H,WORK
+  88  0001                              EXECUTE EXTEND_FUNCTION_1E,054H,WORK
+  89  0001                              EXECUTE EXTEND_FUNCTION_1F,055H,WORK
+  90  0001                              EXECUTE EXTEND_FUNCTION_1G,056H,WORK
+  91  0001                              EXECUTE EXTEND_FUNCTION_1H,057H,WORK
+  92  0001                              EXECUTE EXTEND_FUNCTION_2A,058H,WORK
+  93  0001                              EXECUTE EXTEND_FUNCTION_2B,059H,WORK
+  94  0001                              EXECUTE EXTEND_FUNCTION_2C,05AH,WORK
+  95  0001                              EXECUTE EXTEND_FUNCTION_2D,05BH,WORK
+  96  0001                              EXECUTE EXTEND_FUNCTION_2E,05CH,WORK
+  97  0001                              EXECUTE EXTEND_FUNCTION_2F,05DH,WORK
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 3
+
+  98  0001                              EXECUTE EXTEND_FUNCTION_2G,05EH,WORK
+  99  0001                              EXECUTE EXTEND_FUNCTION_2H,05FH,WORK
+ 100  0001                              ENDM
+ 101  0001                              
+ 102  0001              EXTEND_FUNCTION_HALT_PREPARE MACRO
+ 103  0001                              EXECUTE EXTEND_FUNCTION_1A_HALT_PREPARE,070H,DEF_HALT_PREPARE
+ 104  0001                              EXECUTE EXTEND_FUNCTION_1B_HALT_PREPARE,071H,DEF_HALT_PREPARE
+ 105  0001                              EXECUTE EXTEND_FUNCTION_1C_HALT_PREPARE,072H,DEF_HALT_PREPARE
+ 106  0001                              EXECUTE EXTEND_FUNCTION_1D_HALT_PREPARE,073H,DEF_HALT_PREPARE
+ 107  0001                              EXECUTE EXTEND_FUNCTION_1E_HALT_PREPARE,074H,DEF_HALT_PREPARE
+ 108  0001                              EXECUTE EXTEND_FUNCTION_1F_HALT_PREPARE,075H,DEF_HALT_PREPARE
+ 109  0001                              EXECUTE EXTEND_FUNCTION_1G_HALT_PREPARE,076H,DEF_HALT_PREPARE
+ 110  0001                              EXECUTE EXTEND_FUNCTION_1H_HALT_PREPARE,077H,DEF_HALT_PREPARE
+ 111  0001                              EXECUTE EXTEND_FUNCTION_2A_HALT_PREPARE,078H,DEF_HALT_PREPARE
+ 112  0001                              EXECUTE EXTEND_FUNCTION_2B_HALT_PREPARE,079H,DEF_HALT_PREPARE
+ 113  0001                              EXECUTE EXTEND_FUNCTION_2C_HALT_PREPARE,07AH,DEF_HALT_PREPARE
+ 114  0001                              EXECUTE EXTEND_FUNCTION_2D_HALT_PREPARE,07BH,DEF_HALT_PREPARE
+ 115  0001                              EXECUTE EXTEND_FUNCTION_2E_HALT_PREPARE,07CH,DEF_HALT_PREPARE
+ 116  0001                              EXECUTE EXTEND_FUNCTION_2F_HALT_PREPARE,07DH,DEF_HALT_PREPARE
+ 117  0001                              EXECUTE EXTEND_FUNCTION_2G_HALT_PREPARE,07EH,DEF_HALT_PREPARE
+ 118  0001                              EXECUTE EXTEND_FUNCTION_2H_HALT_PREPARE,07FH,DEF_HALT_PREPARE
+ 119  0001                              ENDM
+ 120  0001              
+ 121  0001              EXTEND_FUNCTION_HALT_WAKEUP MACRO
+ 122  0001                              EXECUTE EXTEND_FUNCTION_1A_HALT_WAKEUP,070H,DEF_HALT_WAKEUP
+ 123  0001                              EXECUTE EXTEND_FUNCTION_1B_HALT_WAKEUP,071H,DEF_HALT_WAKEUP
+ 124  0001                              EXECUTE EXTEND_FUNCTION_1C_HALT_WAKEUP,072H,DEF_HALT_WAKEUP
+ 125  0001                              EXECUTE EXTEND_FUNCTION_1D_HALT_WAKEUP,073H,DEF_HALT_WAKEUP
+ 126  0001                              EXECUTE EXTEND_FUNCTION_1E_HALT_WAKEUP,074H,DEF_HALT_WAKEUP
+ 127  0001                              EXECUTE EXTEND_FUNCTION_1F_HALT_WAKEUP,075H,DEF_HALT_WAKEUP
+ 128  0001                              EXECUTE EXTEND_FUNCTION_1G_HALT_WAKEUP,076H,DEF_HALT_WAKEUP
+ 129  0001                              EXECUTE EXTEND_FUNCTION_1H_HALT_WAKEUP,077H,DEF_HALT_WAKEUP
+ 130  0001                              EXECUTE EXTEND_FUNCTION_2A_HALT_WAKEUP,078H,DEF_HALT_WAKEUP
+ 131  0001                              EXECUTE EXTEND_FUNCTION_2B_HALT_WAKEUP,079H,DEF_HALT_WAKEUP
+ 132  0001                              EXECUTE EXTEND_FUNCTION_2C_HALT_WAKEUP,07AH,DEF_HALT_WAKEUP
+ 133  0001                              EXECUTE EXTEND_FUNCTION_2D_HALT_WAKEUP,07BH,DEF_HALT_WAKEUP
+ 134  0001                              EXECUTE EXTEND_FUNCTION_2E_HALT_WAKEUP,07CH,DEF_HALT_WAKEUP
+ 135  0001                              EXECUTE EXTEND_FUNCTION_2F_HALT_WAKEUP,07DH,DEF_HALT_WAKEUP
+ 136  0001                              EXECUTE EXTEND_FUNCTION_2G_HALT_WAKEUP,07EH,DEF_HALT_WAKEUP
+ 137  0001                              EXECUTE EXTEND_FUNCTION_2H_HALT_WAKEUP,07FH,DEF_HALT_WAKEUP
+ 138  0001                              ENDM
+ 139  0001                              
+ 140  0001              EXTEND_FUNCTION_RETURN_MAIN MACRO
+ 141  0001                              EXECUTE EXTEND_FUNCTION_1A_RETURN_MAIN,080H,DEF_RETURN_MAIN
+ 142  0001                              EXECUTE EXTEND_FUNCTION_1B_RETURN_MAIN,081H,DEF_RETURN_MAIN
+ 143  0001                              EXECUTE EXTEND_FUNCTION_1C_RETURN_MAIN,082H,DEF_RETURN_MAIN
+ 144  0001                              EXECUTE EXTEND_FUNCTION_1D_RETURN_MAIN,083H,DEF_RETURN_MAIN
+ 145  0001                              EXECUTE EXTEND_FUNCTION_1E_RETURN_MAIN,084H,DEF_RETURN_MAIN
+ 146  0001                              EXECUTE EXTEND_FUNCTION_1F_RETURN_MAIN,085H,DEF_RETURN_MAIN
+ 147  0001                              EXECUTE EXTEND_FUNCTION_1G_RETURN_MAIN,086H,DEF_RETURN_MAIN
+ 148  0001                              EXECUTE EXTEND_FUNCTION_1H_RETURN_MAIN,087H,DEF_RETURN_MAIN
+ 149  0001                              EXECUTE EXTEND_FUNCTION_2A_RETURN_MAIN,088H,DEF_RETURN_MAIN
+ 150  0001                              EXECUTE EXTEND_FUNCTION_2B_RETURN_MAIN,089H,DEF_RETURN_MAIN
+ 151  0001                              EXECUTE EXTEND_FUNCTION_2C_RETURN_MAIN,08AH,DEF_RETURN_MAIN
+ 152  0001                              EXECUTE EXTEND_FUNCTION_2D_RETURN_MAIN,08BH,DEF_RETURN_MAIN
+ 153  0001                              EXECUTE EXTEND_FUNCTION_2E_RETURN_MAIN,08CH,DEF_RETURN_MAIN
+ 154  0001                              EXECUTE EXTEND_FUNCTION_2F_RETURN_MAIN,08DH,DEF_RETURN_MAIN
+ 155  0001                              EXECUTE EXTEND_FUNCTION_2G_RETURN_MAIN,08EH,DEF_RETURN_MAIN
+ 156  0001                              EXECUTE EXTEND_FUNCTION_2H_RETURN_MAIN,08FH,DEF_RETURN_MAIN
+ 157  0001                              ENDM
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 4
+
+ 158  0001              
+ 159  0001              
+ 160  0001                              ;==============
+ 161  0001                              ;=CODE SETCTION
+ 162  0001                              ;==============
+ 163  0000              PROGRAM_ENTRY   .SECTION  AT 000H 'CODE'
+ 164  0000                      ifdef   PBP
+ 165  0000                              MOV     BANK PROGRAM_RESET
+ 166  0000                              MOV     PBP,A
+ 167  0000                      endif
+ 168  0000  2800     R                  JMP     PROGRAM_RESET
+ 169  0001              
+ 170  0001                              ;==============
+ 171  0001                              ;=MAIN PROGRAM=
+ 172  0001                              ;==============
+ 173  0000              MAIN_PROGRAM    .SECTION          'CODE'
+ 174  0000              
+ 175  0000                              ;;***********************
+ 176  0000              PROGRAM_RESET:  ;;* PROGRAM ENTRY *******
+ 177  0000                              ;;***********************
+ 178  0000                              ;---------------------
+ 179  0000                              ;-MCU HARDWARE INITIAL
+ 180  0000                              ;---------------------
+ 181  0000                              MCU_HARDWARE_INITIAL
+ 181  0000  0F52      1                                 MOV     A, 00001010B<<3|2
+ 181  0001  009A      1                                 MOV [01AH],A
+ 181  0002            1                                 SET_SYS_CLOCK
+ 181  0002            2                         if 2==0   ;8M
+ 181  0002            2                                 CLR [0CH]. 4
+ 181  0002            2                                 CLR [0CH]. 5
+ 181  0002            2                         endif
+ 181  0002            2                         if 2==1   ;12M
+ 181  0002            2                                 CLR [0CH]. 4
+ 181  0002            2                                 SET [0CH]. 5
+ 181  0002            2                         endif
+ 181  0002            2                         if 2==2   ;16M
+ 181  0002  320C      2                                 SET [0CH]. 4
+ 181  0003  368C      2                                 CLR [0CH]. 5
+ 181  0004            2                         endif
+ 181  0004            2                         
+ 181  0004            2                                 ;//SELECT fSUB
+ 181  0004  378B      2                                 CLR [0BH].7
+ 181  0005  370B      2                                 CLR [0BH].6
+ 181  0006  368B      2                                 CLR [0BH].5
+ 181  0007  308B      2                                 SET [0BH].1
+ 181  0008  300B      2                                 SET [0BH].0
+ 181  0009            2                                 
+ 182  0009                              
+ 183  0009                              ;-IF POWER SAVING ENABLE
+ 184  0009                          ifdef   PBP
+ 185  0009                              MOV     BANK WDT_WAKEUP
+ 186  0009                              MOV     PBP,A
+ 187  0009                          endif
+ 188  0009                      
+ 189  0009  3A0A                        SNZ     PDF
+ 190  000A  2800     R                  JMP     $+3
+ 191  000B  3E8A                        SZ      TO
+ 192  000C  2800     R                  JMP     WDT_WAKEUP              ;IF WAKEUP BY WDT TIME OUT
+ 193  000D              
+ 194  000D                              ;------------------------
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 5
+
+ 195  000D                              ;-CLEAR RAM DATA
+ 196  000D                              ;------------------------
+ 197  000D                              CLEAR_RAM_DATA
+ 197  000D  0F02      1                                 MOV		A, 2
+ 197  000E  00E0      1                                 MOV		[ 060H],A
+ 197  000F            1                                 
+ 197  000F            1                                 
+ 197  000F            1                         CLR_RAM_LOOP:
+ 197  000F  15E0      1                                 DEC		[ 060H]
+ 197  0010  0760      1                                 MOV		A,[ 060H]
+ 197  0011  0084      1                                 MOV [04H],A
+ 197  0012            1                                 
+ 197  0012            1                         if 060H == 080h
+ 197  0012            1                                 MOV		A,80H
+ 197  0012            1                         else
+ 197  0012  0F60      1                                 MOV     A, 060H
+ 197  0013  1084      1                                 SZ [04H]
+ 197  0014  0F80      1                                 MOV		A,80H
+ 197  0015            1                         endif
+ 197  0015  0083      1                                 MOV [03H],A
+ 197  0016  1F02      1                                 CLR [02H]
+ 197  0017  1603      1                                 SIZA [03H]
+ 197  0018  2800     R1                                 JMP     $-3
+ 197  0019  10E0      1                                 SZ		[ 060H]
+ 197  001A  2800     R1                                 JMP		CLR_RAM_LOOP
+ 198  001B                              ;------------------------
+ 199  001B                              ;-EXTEND FUNCTION INITIAL
+ 200  001B                              ;------------------------
+ 201  001B                              EXTEND_FUNCTION_INITIAL
+ 201  001B            1                 EXECUTE EXTEND_FUNCTION_1A_INITIAL,040H,DEF_INITIAL 
+ 201  001B            2         ifdef EXTEND_FUNCTION_1A_INITIAL
+ 201  001B            2                 ifndef DEF_INITIAL
+ 201  001B            2                     #define DEF_INITIAL
+ 201  001B            2                 endif
+ 201  001B            2                 
+ 201  001B            2                 ifdef   PBP
+ 201  001B            2                     MOV     A,BANK _BS84B08C_CTOUCH_INITIAL
+ 201  001B            2                     MOV     PBP,A
+ 201  001B            2                 endif
+ 201  001B            2                     ;-FUCNTION ID CHECK 
+ 201  001B            2                 ifndef      ESCfunctionIDcheck
+ 201  001B            2                     if 040H != 0
+ 201  001B            2                     MOV     A, 040H
+ 201  001B            2                     MOV     _FUNCTION_ID,A
+ 201  001B            2                     endif     
+ 201  001B            2                 endif
+ 201  001B            2                     ;--------------- 
+ 201  001B  2000     E2                     CALL _BS84B08C_CTOUCH_INITIAL
+ 201  001C            2                     ;---------------
+ 201  001C            2                 ifndef      ESCfunctionIDcheck
+ 201  001C            2                     if 040H != 0
+ 201  001C            2                     MOV     A, 040H
+ 201  001C            2                     XOR     A,_FUNCTION_ID
+ 201  001C            2                     SZ [05H]
+ 201  001C            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 201  001C            2                     endif
+ 201  001C            2                 endif     
+ 201  001C            2                     ifdef   PBP
+ 201  001C            2                     MOV     A,BANK MAIN_LOOP
+ 201  001C            2                     MOV     PBP,A
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 6
+
+ 201  001C            2                     endif  
+ 201  001C            2         endif
+ 201  001C            1                 EXECUTE EXTEND_FUNCTION_1B_INITIAL,041H,DEF_INITIAL 
+ 201  001C            2         ifdef EXTEND_FUNCTION_1B_INITIAL
+ 201  001C            2                 ifndef DEF_INITIAL
+ 201  001C            2                     #define DEF_INITIAL
+ 201  001C            2                 endif
+ 201  001C            2                 
+ 201  001C            2                 ifdef   PBP
+ 201  001C            2                     MOV     A,BANK EXTEND_FUNCTION_1B_INITIAL
+ 201  001C            2                     MOV     PBP,A
+ 201  001C            2                 endif
+ 201  001C            2                     ;-FUCNTION ID CHECK 
+ 201  001C            2                 ifndef      ESCfunctionIDcheck
+ 201  001C            2                     if 041H != 0
+ 201  001C            2                     MOV     A, 041H
+ 201  001C            2                     MOV     _FUNCTION_ID,A
+ 201  001C            2                     endif     
+ 201  001C            2                 endif
+ 201  001C            2                     ;--------------- 
+ 201  001C            2                     CALL EXTEND_FUNCTION_1B_INITIAL
+ 201  001C            2                     ;---------------
+ 201  001C            2                 ifndef      ESCfunctionIDcheck
+ 201  001C            2                     if 041H != 0
+ 201  001C            2                     MOV     A, 041H
+ 201  001C            2                     XOR     A,_FUNCTION_ID
+ 201  001C            2                     SZ [05H]
+ 201  001C            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 201  001C            2                     endif
+ 201  001C            2                 endif     
+ 201  001C            2                     ifdef   PBP
+ 201  001C            2                     MOV     A,BANK MAIN_LOOP
+ 201  001C            2                     MOV     PBP,A
+ 201  001C            2                     endif  
+ 201  001C            2         endif
+ 201  001C            1                 EXECUTE EXTEND_FUNCTION_1C_INITIAL,042H,DEF_INITIAL 
+ 201  001C            2         ifdef EXTEND_FUNCTION_1C_INITIAL
+ 201  001C            2                 ifndef DEF_INITIAL
+ 201  001C            2                     #define DEF_INITIAL
+ 201  001C            2                 endif
+ 201  001C            2                 
+ 201  001C            2                 ifdef   PBP
+ 201  001C            2                     MOV     A,BANK EXTEND_FUNCTION_1C_INITIAL
+ 201  001C            2                     MOV     PBP,A
+ 201  001C            2                 endif
+ 201  001C            2                     ;-FUCNTION ID CHECK 
+ 201  001C            2                 ifndef      ESCfunctionIDcheck
+ 201  001C            2                     if 042H != 0
+ 201  001C            2                     MOV     A, 042H
+ 201  001C            2                     MOV     _FUNCTION_ID,A
+ 201  001C            2                     endif     
+ 201  001C            2                 endif
+ 201  001C            2                     ;--------------- 
+ 201  001C            2                     CALL EXTEND_FUNCTION_1C_INITIAL
+ 201  001C            2                     ;---------------
+ 201  001C            2                 ifndef      ESCfunctionIDcheck
+ 201  001C            2                     if 042H != 0
+ 201  001C            2                     MOV     A, 042H
+ 201  001C            2                     XOR     A,_FUNCTION_ID
+ 201  001C            2                     SZ [05H]
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 7
+
+ 201  001C            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 201  001C            2                     endif
+ 201  001C            2                 endif     
+ 201  001C            2                     ifdef   PBP
+ 201  001C            2                     MOV     A,BANK MAIN_LOOP
+ 201  001C            2                     MOV     PBP,A
+ 201  001C            2                     endif  
+ 201  001C            2         endif
+ 201  001C            1                 EXECUTE EXTEND_FUNCTION_1D_INITIAL,043H,DEF_INITIAL 
+ 201  001C            2         ifdef EXTEND_FUNCTION_1D_INITIAL
+ 201  001C            2                 ifndef DEF_INITIAL
+ 201  001C            2                     #define DEF_INITIAL
+ 201  001C            2                 endif
+ 201  001C            2                 
+ 201  001C            2                 ifdef   PBP
+ 201  001C            2                     MOV     A,BANK _USER_PROGRAM_INITIAL
+ 201  001C            2                     MOV     PBP,A
+ 201  001C            2                 endif
+ 201  001C            2                     ;-FUCNTION ID CHECK 
+ 201  001C            2                 ifndef      ESCfunctionIDcheck
+ 201  001C            2                     if 043H != 0
+ 201  001C            2                     MOV     A, 043H
+ 201  001C            2                     MOV     _FUNCTION_ID,A
+ 201  001C            2                     endif     
+ 201  001C            2                 endif
+ 201  001C            2                     ;--------------- 
+ 201  001C  2000     E2                     CALL _USER_PROGRAM_INITIAL
+ 201  001D            2                     ;---------------
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 043H != 0
+ 201  001D            2                     MOV     A, 043H
+ 201  001D            2                     XOR     A,_FUNCTION_ID
+ 201  001D            2                     SZ [05H]
+ 201  001D            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 201  001D            2                     endif
+ 201  001D            2                 endif     
+ 201  001D            2                     ifdef   PBP
+ 201  001D            2                     MOV     A,BANK MAIN_LOOP
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                     endif  
+ 201  001D            2         endif
+ 201  001D            1                 EXECUTE EXTEND_FUNCTION_1E_INITIAL,044H,DEF_INITIAL 
+ 201  001D            2         ifdef EXTEND_FUNCTION_1E_INITIAL
+ 201  001D            2                 ifndef DEF_INITIAL
+ 201  001D            2                     #define DEF_INITIAL
+ 201  001D            2                 endif
+ 201  001D            2                 
+ 201  001D            2                 ifdef   PBP
+ 201  001D            2                     MOV     A,BANK EXTEND_FUNCTION_1E_INITIAL
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                 endif
+ 201  001D            2                     ;-FUCNTION ID CHECK 
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 044H != 0
+ 201  001D            2                     MOV     A, 044H
+ 201  001D            2                     MOV     _FUNCTION_ID,A
+ 201  001D            2                     endif     
+ 201  001D            2                 endif
+ 201  001D            2                     ;--------------- 
+ 201  001D            2                     CALL EXTEND_FUNCTION_1E_INITIAL
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 8
+
+ 201  001D            2                     ;---------------
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 044H != 0
+ 201  001D            2                     MOV     A, 044H
+ 201  001D            2                     XOR     A,_FUNCTION_ID
+ 201  001D            2                     SZ [05H]
+ 201  001D            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 201  001D            2                     endif
+ 201  001D            2                 endif     
+ 201  001D            2                     ifdef   PBP
+ 201  001D            2                     MOV     A,BANK MAIN_LOOP
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                     endif  
+ 201  001D            2         endif
+ 201  001D            1                 EXECUTE EXTEND_FUNCTION_1F_INITIAL,045H,DEF_INITIAL 
+ 201  001D            2         ifdef EXTEND_FUNCTION_1F_INITIAL
+ 201  001D            2                 ifndef DEF_INITIAL
+ 201  001D            2                     #define DEF_INITIAL
+ 201  001D            2                 endif
+ 201  001D            2                 
+ 201  001D            2                 ifdef   PBP
+ 201  001D            2                     MOV     A,BANK EXTEND_FUNCTION_1F_INITIAL
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                 endif
+ 201  001D            2                     ;-FUCNTION ID CHECK 
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 045H != 0
+ 201  001D            2                     MOV     A, 045H
+ 201  001D            2                     MOV     _FUNCTION_ID,A
+ 201  001D            2                     endif     
+ 201  001D            2                 endif
+ 201  001D            2                     ;--------------- 
+ 201  001D            2                     CALL EXTEND_FUNCTION_1F_INITIAL
+ 201  001D            2                     ;---------------
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 045H != 0
+ 201  001D            2                     MOV     A, 045H
+ 201  001D            2                     XOR     A,_FUNCTION_ID
+ 201  001D            2                     SZ [05H]
+ 201  001D            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 201  001D            2                     endif
+ 201  001D            2                 endif     
+ 201  001D            2                     ifdef   PBP
+ 201  001D            2                     MOV     A,BANK MAIN_LOOP
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                     endif  
+ 201  001D            2         endif
+ 201  001D            1                 EXECUTE EXTEND_FUNCTION_1G_INITIAL,046H,DEF_INITIAL 
+ 201  001D            2         ifdef EXTEND_FUNCTION_1G_INITIAL
+ 201  001D            2                 ifndef DEF_INITIAL
+ 201  001D            2                     #define DEF_INITIAL
+ 201  001D            2                 endif
+ 201  001D            2                 
+ 201  001D            2                 ifdef   PBP
+ 201  001D            2                     MOV     A,BANK EXTEND_FUNCTION_1G_INITIAL
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                 endif
+ 201  001D            2                     ;-FUCNTION ID CHECK 
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 046H != 0
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 9
+
+ 201  001D            2                     MOV     A, 046H
+ 201  001D            2                     MOV     _FUNCTION_ID,A
+ 201  001D            2                     endif     
+ 201  001D            2                 endif
+ 201  001D            2                     ;--------------- 
+ 201  001D            2                     CALL EXTEND_FUNCTION_1G_INITIAL
+ 201  001D            2                     ;---------------
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 046H != 0
+ 201  001D            2                     MOV     A, 046H
+ 201  001D            2                     XOR     A,_FUNCTION_ID
+ 201  001D            2                     SZ [05H]
+ 201  001D            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 201  001D            2                     endif
+ 201  001D            2                 endif     
+ 201  001D            2                     ifdef   PBP
+ 201  001D            2                     MOV     A,BANK MAIN_LOOP
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                     endif  
+ 201  001D            2         endif
+ 201  001D            1                 EXECUTE EXTEND_FUNCTION_1H_INITIAL,047H,DEF_INITIAL 
+ 201  001D            2         ifdef EXTEND_FUNCTION_1H_INITIAL
+ 201  001D            2                 ifndef DEF_INITIAL
+ 201  001D            2                     #define DEF_INITIAL
+ 201  001D            2                 endif
+ 201  001D            2                 
+ 201  001D            2                 ifdef   PBP
+ 201  001D            2                     MOV     A,BANK EXTEND_FUNCTION_1H_INITIAL
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                 endif
+ 201  001D            2                     ;-FUCNTION ID CHECK 
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 047H != 0
+ 201  001D            2                     MOV     A, 047H
+ 201  001D            2                     MOV     _FUNCTION_ID,A
+ 201  001D            2                     endif     
+ 201  001D            2                 endif
+ 201  001D            2                     ;--------------- 
+ 201  001D            2                     CALL EXTEND_FUNCTION_1H_INITIAL
+ 201  001D            2                     ;---------------
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 047H != 0
+ 201  001D            2                     MOV     A, 047H
+ 201  001D            2                     XOR     A,_FUNCTION_ID
+ 201  001D            2                     SZ [05H]
+ 201  001D            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 201  001D            2                     endif
+ 201  001D            2                 endif     
+ 201  001D            2                     ifdef   PBP
+ 201  001D            2                     MOV     A,BANK MAIN_LOOP
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                     endif  
+ 201  001D            2         endif
+ 201  001D            1                 EXECUTE EXTEND_FUNCTION_2A_INITIAL,048H,DEF_INITIAL
+ 201  001D            2         ifdef EXTEND_FUNCTION_2A_INITIAL
+ 201  001D            2                 ifndef DEF_INITIAL
+ 201  001D            2                     #define DEF_INITIAL
+ 201  001D            2                 endif
+ 201  001D            2                 
+ 201  001D            2                 ifdef   PBP
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 10
+
+ 201  001D            2                     MOV     A,BANK EXTEND_FUNCTION_2A_INITIAL
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                 endif
+ 201  001D            2                     ;-FUCNTION ID CHECK 
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 048H != 0
+ 201  001D            2                     MOV     A, 048H
+ 201  001D            2                     MOV     _FUNCTION_ID,A
+ 201  001D            2                     endif     
+ 201  001D            2                 endif
+ 201  001D            2                     ;--------------- 
+ 201  001D            2                     CALL EXTEND_FUNCTION_2A_INITIAL
+ 201  001D            2                     ;---------------
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 048H != 0
+ 201  001D            2                     MOV     A, 048H
+ 201  001D            2                     XOR     A,_FUNCTION_ID
+ 201  001D            2                     SZ [05H]
+ 201  001D            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 201  001D            2                     endif
+ 201  001D            2                 endif     
+ 201  001D            2                     ifdef   PBP
+ 201  001D            2                     MOV     A,BANK MAIN_LOOP
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                     endif  
+ 201  001D            2         endif
+ 201  001D            1                 EXECUTE EXTEND_FUNCTION_2B_INITIAL,049H,DEF_INITIAL
+ 201  001D            2         ifdef EXTEND_FUNCTION_2B_INITIAL
+ 201  001D            2                 ifndef DEF_INITIAL
+ 201  001D            2                     #define DEF_INITIAL
+ 201  001D            2                 endif
+ 201  001D            2                 
+ 201  001D            2                 ifdef   PBP
+ 201  001D            2                     MOV     A,BANK EXTEND_FUNCTION_2B_INITIAL
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                 endif
+ 201  001D            2                     ;-FUCNTION ID CHECK 
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 049H != 0
+ 201  001D            2                     MOV     A, 049H
+ 201  001D            2                     MOV     _FUNCTION_ID,A
+ 201  001D            2                     endif     
+ 201  001D            2                 endif
+ 201  001D            2                     ;--------------- 
+ 201  001D            2                     CALL EXTEND_FUNCTION_2B_INITIAL
+ 201  001D            2                     ;---------------
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 049H != 0
+ 201  001D            2                     MOV     A, 049H
+ 201  001D            2                     XOR     A,_FUNCTION_ID
+ 201  001D            2                     SZ [05H]
+ 201  001D            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 201  001D            2                     endif
+ 201  001D            2                 endif     
+ 201  001D            2                     ifdef   PBP
+ 201  001D            2                     MOV     A,BANK MAIN_LOOP
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                     endif  
+ 201  001D            2         endif
+ 201  001D            1                 EXECUTE EXTEND_FUNCTION_2C_INITIAL,04AH,DEF_INITIAL
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 11
+
+ 201  001D            2         ifdef EXTEND_FUNCTION_2C_INITIAL
+ 201  001D            2                 ifndef DEF_INITIAL
+ 201  001D            2                     #define DEF_INITIAL
+ 201  001D            2                 endif
+ 201  001D            2                 
+ 201  001D            2                 ifdef   PBP
+ 201  001D            2                     MOV     A,BANK EXTEND_FUNCTION_2C_INITIAL
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                 endif
+ 201  001D            2                     ;-FUCNTION ID CHECK 
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 04AH != 0
+ 201  001D            2                     MOV     A, 04AH
+ 201  001D            2                     MOV     _FUNCTION_ID,A
+ 201  001D            2                     endif     
+ 201  001D            2                 endif
+ 201  001D            2                     ;--------------- 
+ 201  001D            2                     CALL EXTEND_FUNCTION_2C_INITIAL
+ 201  001D            2                     ;---------------
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 04AH != 0
+ 201  001D            2                     MOV     A, 04AH
+ 201  001D            2                     XOR     A,_FUNCTION_ID
+ 201  001D            2                     SZ [05H]
+ 201  001D            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 201  001D            2                     endif
+ 201  001D            2                 endif     
+ 201  001D            2                     ifdef   PBP
+ 201  001D            2                     MOV     A,BANK MAIN_LOOP
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                     endif  
+ 201  001D            2         endif
+ 201  001D            1                 EXECUTE EXTEND_FUNCTION_2D_INITIAL,04BH,DEF_INITIAL
+ 201  001D            2         ifdef EXTEND_FUNCTION_2D_INITIAL
+ 201  001D            2                 ifndef DEF_INITIAL
+ 201  001D            2                     #define DEF_INITIAL
+ 201  001D            2                 endif
+ 201  001D            2                 
+ 201  001D            2                 ifdef   PBP
+ 201  001D            2                     MOV     A,BANK EXTEND_FUNCTION_2D_INITIAL
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                 endif
+ 201  001D            2                     ;-FUCNTION ID CHECK 
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 04BH != 0
+ 201  001D            2                     MOV     A, 04BH
+ 201  001D            2                     MOV     _FUNCTION_ID,A
+ 201  001D            2                     endif     
+ 201  001D            2                 endif
+ 201  001D            2                     ;--------------- 
+ 201  001D            2                     CALL EXTEND_FUNCTION_2D_INITIAL
+ 201  001D            2                     ;---------------
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 04BH != 0
+ 201  001D            2                     MOV     A, 04BH
+ 201  001D            2                     XOR     A,_FUNCTION_ID
+ 201  001D            2                     SZ [05H]
+ 201  001D            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 201  001D            2                     endif
+ 201  001D            2                 endif     
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 12
+
+ 201  001D            2                     ifdef   PBP
+ 201  001D            2                     MOV     A,BANK MAIN_LOOP
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                     endif  
+ 201  001D            2         endif
+ 201  001D            1                 EXECUTE EXTEND_FUNCTION_2E_INITIAL,04CH,DEF_INITIAL
+ 201  001D            2         ifdef EXTEND_FUNCTION_2E_INITIAL
+ 201  001D            2                 ifndef DEF_INITIAL
+ 201  001D            2                     #define DEF_INITIAL
+ 201  001D            2                 endif
+ 201  001D            2                 
+ 201  001D            2                 ifdef   PBP
+ 201  001D            2                     MOV     A,BANK EXTEND_FUNCTION_2E_INITIAL
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                 endif
+ 201  001D            2                     ;-FUCNTION ID CHECK 
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 04CH != 0
+ 201  001D            2                     MOV     A, 04CH
+ 201  001D            2                     MOV     _FUNCTION_ID,A
+ 201  001D            2                     endif     
+ 201  001D            2                 endif
+ 201  001D            2                     ;--------------- 
+ 201  001D            2                     CALL EXTEND_FUNCTION_2E_INITIAL
+ 201  001D            2                     ;---------------
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 04CH != 0
+ 201  001D            2                     MOV     A, 04CH
+ 201  001D            2                     XOR     A,_FUNCTION_ID
+ 201  001D            2                     SZ [05H]
+ 201  001D            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 201  001D            2                     endif
+ 201  001D            2                 endif     
+ 201  001D            2                     ifdef   PBP
+ 201  001D            2                     MOV     A,BANK MAIN_LOOP
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                     endif  
+ 201  001D            2         endif
+ 201  001D            1                 EXECUTE EXTEND_FUNCTION_2F_INITIAL,04DH,DEF_INITIAL
+ 201  001D            2         ifdef EXTEND_FUNCTION_2F_INITIAL
+ 201  001D            2                 ifndef DEF_INITIAL
+ 201  001D            2                     #define DEF_INITIAL
+ 201  001D            2                 endif
+ 201  001D            2                 
+ 201  001D            2                 ifdef   PBP
+ 201  001D            2                     MOV     A,BANK EXTEND_FUNCTION_2F_INITIAL
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                 endif
+ 201  001D            2                     ;-FUCNTION ID CHECK 
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 04DH != 0
+ 201  001D            2                     MOV     A, 04DH
+ 201  001D            2                     MOV     _FUNCTION_ID,A
+ 201  001D            2                     endif     
+ 201  001D            2                 endif
+ 201  001D            2                     ;--------------- 
+ 201  001D            2                     CALL EXTEND_FUNCTION_2F_INITIAL
+ 201  001D            2                     ;---------------
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 04DH != 0
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 13
+
+ 201  001D            2                     MOV     A, 04DH
+ 201  001D            2                     XOR     A,_FUNCTION_ID
+ 201  001D            2                     SZ [05H]
+ 201  001D            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 201  001D            2                     endif
+ 201  001D            2                 endif     
+ 201  001D            2                     ifdef   PBP
+ 201  001D            2                     MOV     A,BANK MAIN_LOOP
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                     endif  
+ 201  001D            2         endif
+ 201  001D            1                 EXECUTE EXTEND_FUNCTION_2G_INITIAL,04EH,DEF_INITIAL
+ 201  001D            2         ifdef EXTEND_FUNCTION_2G_INITIAL
+ 201  001D            2                 ifndef DEF_INITIAL
+ 201  001D            2                     #define DEF_INITIAL
+ 201  001D            2                 endif
+ 201  001D            2                 
+ 201  001D            2                 ifdef   PBP
+ 201  001D            2                     MOV     A,BANK EXTEND_FUNCTION_2G_INITIAL
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                 endif
+ 201  001D            2                     ;-FUCNTION ID CHECK 
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 04EH != 0
+ 201  001D            2                     MOV     A, 04EH
+ 201  001D            2                     MOV     _FUNCTION_ID,A
+ 201  001D            2                     endif     
+ 201  001D            2                 endif
+ 201  001D            2                     ;--------------- 
+ 201  001D            2                     CALL EXTEND_FUNCTION_2G_INITIAL
+ 201  001D            2                     ;---------------
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 04EH != 0
+ 201  001D            2                     MOV     A, 04EH
+ 201  001D            2                     XOR     A,_FUNCTION_ID
+ 201  001D            2                     SZ [05H]
+ 201  001D            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 201  001D            2                     endif
+ 201  001D            2                 endif     
+ 201  001D            2                     ifdef   PBP
+ 201  001D            2                     MOV     A,BANK MAIN_LOOP
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                     endif  
+ 201  001D            2         endif
+ 201  001D            1                 EXECUTE EXTEND_FUNCTION_2H_INITIAL,04FH,DEF_INITIAL
+ 201  001D            2         ifdef EXTEND_FUNCTION_2H_INITIAL
+ 201  001D            2                 ifndef DEF_INITIAL
+ 201  001D            2                     #define DEF_INITIAL
+ 201  001D            2                 endif
+ 201  001D            2                 
+ 201  001D            2                 ifdef   PBP
+ 201  001D            2                     MOV     A,BANK EXTEND_FUNCTION_2H_INITIAL
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                 endif
+ 201  001D            2                     ;-FUCNTION ID CHECK 
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 04FH != 0
+ 201  001D            2                     MOV     A, 04FH
+ 201  001D            2                     MOV     _FUNCTION_ID,A
+ 201  001D            2                     endif     
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 14
+
+ 201  001D            2                 endif
+ 201  001D            2                     ;--------------- 
+ 201  001D            2                     CALL EXTEND_FUNCTION_2H_INITIAL
+ 201  001D            2                     ;---------------
+ 201  001D            2                 ifndef      ESCfunctionIDcheck
+ 201  001D            2                     if 04FH != 0
+ 201  001D            2                     MOV     A, 04FH
+ 201  001D            2                     XOR     A,_FUNCTION_ID
+ 201  001D            2                     SZ [05H]
+ 201  001D            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 201  001D            2                     endif
+ 201  001D            2                 endif     
+ 201  001D            2                     ifdef   PBP
+ 201  001D            2                     MOV     A,BANK MAIN_LOOP
+ 201  001D            2                     MOV     PBP,A
+ 201  001D            2                     endif  
+ 201  001D            2         endif
+ 202  001D                              
+ 203  001D              
+ 204  001D                              ;;-----------------------
+ 205  001D              MAIN_LOOP:      ;;- MAIN PROGRAM LOOP ---
+ 206  001D                              ;;-----------------------
+ 207  001D  0001                        CLR     WDT
+ 208  001E  0001                        CLR     WDT1
+ 209  001F  0005                        CLR     WDT2
+ 210  0020                              ;----------------------
+ 211  0020                              ;-RE INITIAL SYS. CLOCK
+ 212  0020                              ;----------------------
+ 213  0020                              
+ 214  0020                              RELOAD_SYS_CLOCK
+ 214  0020            1                                 SET_SYS_CLOCK
+ 214  0020            2                         if 2==0   ;8M
+ 214  0020            2                                 CLR [0CH]. 4
+ 214  0020            2                                 CLR [0CH]. 5
+ 214  0020            2                         endif
+ 214  0020            2                         if 2==1   ;12M
+ 214  0020            2                                 CLR [0CH]. 4
+ 214  0020            2                                 SET [0CH]. 5
+ 214  0020            2                         endif
+ 214  0020            2                         if 2==2   ;16M
+ 214  0020  320C      2                                 SET [0CH]. 4
+ 214  0021  368C      2                                 CLR [0CH]. 5
+ 214  0022            2                         endif
+ 214  0022            2                         
+ 214  0022            2                                 ;//SELECT fSUB
+ 214  0022  378B      2                                 CLR [0BH].7
+ 214  0023  370B      2                                 CLR [0BH].6
+ 214  0024  368B      2                                 CLR [0BH].5
+ 214  0025  308B      2                                 SET [0BH].1
+ 214  0026  300B      2                                 SET [0BH].0
+ 214  0027            2                                 
+ 215  0027                              
+ 216  0027  1F80     R                  SET     _HALT_STATE
+ 217  0028                              
+ 218  0028                              EXTEND_FUNCTION_WORK
+ 218  0028            1                 EXECUTE EXTEND_FUNCTION_1A,050H,WORK
+ 218  0028            2         ifdef EXTEND_FUNCTION_1A
+ 218  0028            2                 ifndef WORK
+ 218  0028            2                     #define WORK
+ 218  0028            2                 endif
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 15
+
+ 218  0028            2                 
+ 218  0028            2                 ifdef   PBP
+ 218  0028            2                     MOV     A,BANK _BS84B08C_CTOUCH
+ 218  0028            2                     MOV     PBP,A
+ 218  0028            2                 endif
+ 218  0028            2                     ;-FUCNTION ID CHECK 
+ 218  0028            2                 ifndef      ESCfunctionIDcheck
+ 218  0028            2                     if 050H != 0
+ 218  0028            2                     MOV     A, 050H
+ 218  0028            2                     MOV     _FUNCTION_ID,A
+ 218  0028            2                     endif     
+ 218  0028            2                 endif
+ 218  0028            2                     ;--------------- 
+ 218  0028  2000     E2                     CALL _BS84B08C_CTOUCH
+ 218  0029            2                     ;---------------
+ 218  0029            2                 ifndef      ESCfunctionIDcheck
+ 218  0029            2                     if 050H != 0
+ 218  0029            2                     MOV     A, 050H
+ 218  0029            2                     XOR     A,_FUNCTION_ID
+ 218  0029            2                     SZ [05H]
+ 218  0029            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 218  0029            2                     endif
+ 218  0029            2                 endif     
+ 218  0029            2                     ifdef   PBP
+ 218  0029            2                     MOV     A,BANK MAIN_LOOP
+ 218  0029            2                     MOV     PBP,A
+ 218  0029            2                     endif  
+ 218  0029            2         endif
+ 218  0029            1                 EXECUTE EXTEND_FUNCTION_1B,051H,WORK
+ 218  0029            2         ifdef EXTEND_FUNCTION_1B
+ 218  0029            2                 ifndef WORK
+ 218  0029            2                     #define WORK
+ 218  0029            2                 endif
+ 218  0029            2                 
+ 218  0029            2                 ifdef   PBP
+ 218  0029            2                     MOV     A,BANK EXTEND_FUNCTION_1B
+ 218  0029            2                     MOV     PBP,A
+ 218  0029            2                 endif
+ 218  0029            2                     ;-FUCNTION ID CHECK 
+ 218  0029            2                 ifndef      ESCfunctionIDcheck
+ 218  0029            2                     if 051H != 0
+ 218  0029            2                     MOV     A, 051H
+ 218  0029            2                     MOV     _FUNCTION_ID,A
+ 218  0029            2                     endif     
+ 218  0029            2                 endif
+ 218  0029            2                     ;--------------- 
+ 218  0029            2                     CALL EXTEND_FUNCTION_1B
+ 218  0029            2                     ;---------------
+ 218  0029            2                 ifndef      ESCfunctionIDcheck
+ 218  0029            2                     if 051H != 0
+ 218  0029            2                     MOV     A, 051H
+ 218  0029            2                     XOR     A,_FUNCTION_ID
+ 218  0029            2                     SZ [05H]
+ 218  0029            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 218  0029            2                     endif
+ 218  0029            2                 endif     
+ 218  0029            2                     ifdef   PBP
+ 218  0029            2                     MOV     A,BANK MAIN_LOOP
+ 218  0029            2                     MOV     PBP,A
+ 218  0029            2                     endif  
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 16
+
+ 218  0029            2         endif
+ 218  0029            1                 EXECUTE EXTEND_FUNCTION_1C,052H,WORK
+ 218  0029            2         ifdef EXTEND_FUNCTION_1C
+ 218  0029            2                 ifndef WORK
+ 218  0029            2                     #define WORK
+ 218  0029            2                 endif
+ 218  0029            2                 
+ 218  0029            2                 ifdef   PBP
+ 218  0029            2                     MOV     A,BANK EXTEND_FUNCTION_1C
+ 218  0029            2                     MOV     PBP,A
+ 218  0029            2                 endif
+ 218  0029            2                     ;-FUCNTION ID CHECK 
+ 218  0029            2                 ifndef      ESCfunctionIDcheck
+ 218  0029            2                     if 052H != 0
+ 218  0029            2                     MOV     A, 052H
+ 218  0029            2                     MOV     _FUNCTION_ID,A
+ 218  0029            2                     endif     
+ 218  0029            2                 endif
+ 218  0029            2                     ;--------------- 
+ 218  0029            2                     CALL EXTEND_FUNCTION_1C
+ 218  0029            2                     ;---------------
+ 218  0029            2                 ifndef      ESCfunctionIDcheck
+ 218  0029            2                     if 052H != 0
+ 218  0029            2                     MOV     A, 052H
+ 218  0029            2                     XOR     A,_FUNCTION_ID
+ 218  0029            2                     SZ [05H]
+ 218  0029            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 218  0029            2                     endif
+ 218  0029            2                 endif     
+ 218  0029            2                     ifdef   PBP
+ 218  0029            2                     MOV     A,BANK MAIN_LOOP
+ 218  0029            2                     MOV     PBP,A
+ 218  0029            2                     endif  
+ 218  0029            2         endif
+ 218  0029            1                 EXECUTE EXTEND_FUNCTION_1D,053H,WORK
+ 218  0029            2         ifdef EXTEND_FUNCTION_1D
+ 218  0029            2                 ifndef WORK
+ 218  0029            2                     #define WORK
+ 218  0029            2                 endif
+ 218  0029            2                 
+ 218  0029            2                 ifdef   PBP
+ 218  0029            2                     MOV     A,BANK _USER_PROGRAM
+ 218  0029            2                     MOV     PBP,A
+ 218  0029            2                 endif
+ 218  0029            2                     ;-FUCNTION ID CHECK 
+ 218  0029            2                 ifndef      ESCfunctionIDcheck
+ 218  0029            2                     if 053H != 0
+ 218  0029            2                     MOV     A, 053H
+ 218  0029            2                     MOV     _FUNCTION_ID,A
+ 218  0029            2                     endif     
+ 218  0029            2                 endif
+ 218  0029            2                     ;--------------- 
+ 218  0029  2000     E2                     CALL _USER_PROGRAM
+ 218  002A            2                     ;---------------
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 053H != 0
+ 218  002A            2                     MOV     A, 053H
+ 218  002A            2                     XOR     A,_FUNCTION_ID
+ 218  002A            2                     SZ [05H]
+ 218  002A            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 17
+
+ 218  002A            2                     endif
+ 218  002A            2                 endif     
+ 218  002A            2                     ifdef   PBP
+ 218  002A            2                     MOV     A,BANK MAIN_LOOP
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                     endif  
+ 218  002A            2         endif
+ 218  002A            1                 EXECUTE EXTEND_FUNCTION_1E,054H,WORK
+ 218  002A            2         ifdef EXTEND_FUNCTION_1E
+ 218  002A            2                 ifndef WORK
+ 218  002A            2                     #define WORK
+ 218  002A            2                 endif
+ 218  002A            2                 
+ 218  002A            2                 ifdef   PBP
+ 218  002A            2                     MOV     A,BANK EXTEND_FUNCTION_1E
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                 endif
+ 218  002A            2                     ;-FUCNTION ID CHECK 
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 054H != 0
+ 218  002A            2                     MOV     A, 054H
+ 218  002A            2                     MOV     _FUNCTION_ID,A
+ 218  002A            2                     endif     
+ 218  002A            2                 endif
+ 218  002A            2                     ;--------------- 
+ 218  002A            2                     CALL EXTEND_FUNCTION_1E
+ 218  002A            2                     ;---------------
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 054H != 0
+ 218  002A            2                     MOV     A, 054H
+ 218  002A            2                     XOR     A,_FUNCTION_ID
+ 218  002A            2                     SZ [05H]
+ 218  002A            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 218  002A            2                     endif
+ 218  002A            2                 endif     
+ 218  002A            2                     ifdef   PBP
+ 218  002A            2                     MOV     A,BANK MAIN_LOOP
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                     endif  
+ 218  002A            2         endif
+ 218  002A            1                 EXECUTE EXTEND_FUNCTION_1F,055H,WORK
+ 218  002A            2         ifdef EXTEND_FUNCTION_1F
+ 218  002A            2                 ifndef WORK
+ 218  002A            2                     #define WORK
+ 218  002A            2                 endif
+ 218  002A            2                 
+ 218  002A            2                 ifdef   PBP
+ 218  002A            2                     MOV     A,BANK EXTEND_FUNCTION_1F
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                 endif
+ 218  002A            2                     ;-FUCNTION ID CHECK 
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 055H != 0
+ 218  002A            2                     MOV     A, 055H
+ 218  002A            2                     MOV     _FUNCTION_ID,A
+ 218  002A            2                     endif     
+ 218  002A            2                 endif
+ 218  002A            2                     ;--------------- 
+ 218  002A            2                     CALL EXTEND_FUNCTION_1F
+ 218  002A            2                     ;---------------
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 18
+
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 055H != 0
+ 218  002A            2                     MOV     A, 055H
+ 218  002A            2                     XOR     A,_FUNCTION_ID
+ 218  002A            2                     SZ [05H]
+ 218  002A            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 218  002A            2                     endif
+ 218  002A            2                 endif     
+ 218  002A            2                     ifdef   PBP
+ 218  002A            2                     MOV     A,BANK MAIN_LOOP
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                     endif  
+ 218  002A            2         endif
+ 218  002A            1                 EXECUTE EXTEND_FUNCTION_1G,056H,WORK
+ 218  002A            2         ifdef EXTEND_FUNCTION_1G
+ 218  002A            2                 ifndef WORK
+ 218  002A            2                     #define WORK
+ 218  002A            2                 endif
+ 218  002A            2                 
+ 218  002A            2                 ifdef   PBP
+ 218  002A            2                     MOV     A,BANK EXTEND_FUNCTION_1G
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                 endif
+ 218  002A            2                     ;-FUCNTION ID CHECK 
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 056H != 0
+ 218  002A            2                     MOV     A, 056H
+ 218  002A            2                     MOV     _FUNCTION_ID,A
+ 218  002A            2                     endif     
+ 218  002A            2                 endif
+ 218  002A            2                     ;--------------- 
+ 218  002A            2                     CALL EXTEND_FUNCTION_1G
+ 218  002A            2                     ;---------------
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 056H != 0
+ 218  002A            2                     MOV     A, 056H
+ 218  002A            2                     XOR     A,_FUNCTION_ID
+ 218  002A            2                     SZ [05H]
+ 218  002A            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 218  002A            2                     endif
+ 218  002A            2                 endif     
+ 218  002A            2                     ifdef   PBP
+ 218  002A            2                     MOV     A,BANK MAIN_LOOP
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                     endif  
+ 218  002A            2         endif
+ 218  002A            1                 EXECUTE EXTEND_FUNCTION_1H,057H,WORK
+ 218  002A            2         ifdef EXTEND_FUNCTION_1H
+ 218  002A            2                 ifndef WORK
+ 218  002A            2                     #define WORK
+ 218  002A            2                 endif
+ 218  002A            2                 
+ 218  002A            2                 ifdef   PBP
+ 218  002A            2                     MOV     A,BANK EXTEND_FUNCTION_1H
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                 endif
+ 218  002A            2                     ;-FUCNTION ID CHECK 
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 057H != 0
+ 218  002A            2                     MOV     A, 057H
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 19
+
+ 218  002A            2                     MOV     _FUNCTION_ID,A
+ 218  002A            2                     endif     
+ 218  002A            2                 endif
+ 218  002A            2                     ;--------------- 
+ 218  002A            2                     CALL EXTEND_FUNCTION_1H
+ 218  002A            2                     ;---------------
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 057H != 0
+ 218  002A            2                     MOV     A, 057H
+ 218  002A            2                     XOR     A,_FUNCTION_ID
+ 218  002A            2                     SZ [05H]
+ 218  002A            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 218  002A            2                     endif
+ 218  002A            2                 endif     
+ 218  002A            2                     ifdef   PBP
+ 218  002A            2                     MOV     A,BANK MAIN_LOOP
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                     endif  
+ 218  002A            2         endif
+ 218  002A            1                 EXECUTE EXTEND_FUNCTION_2A,058H,WORK
+ 218  002A            2         ifdef EXTEND_FUNCTION_2A
+ 218  002A            2                 ifndef WORK
+ 218  002A            2                     #define WORK
+ 218  002A            2                 endif
+ 218  002A            2                 
+ 218  002A            2                 ifdef   PBP
+ 218  002A            2                     MOV     A,BANK EXTEND_FUNCTION_2A
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                 endif
+ 218  002A            2                     ;-FUCNTION ID CHECK 
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 058H != 0
+ 218  002A            2                     MOV     A, 058H
+ 218  002A            2                     MOV     _FUNCTION_ID,A
+ 218  002A            2                     endif     
+ 218  002A            2                 endif
+ 218  002A            2                     ;--------------- 
+ 218  002A            2                     CALL EXTEND_FUNCTION_2A
+ 218  002A            2                     ;---------------
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 058H != 0
+ 218  002A            2                     MOV     A, 058H
+ 218  002A            2                     XOR     A,_FUNCTION_ID
+ 218  002A            2                     SZ [05H]
+ 218  002A            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 218  002A            2                     endif
+ 218  002A            2                 endif     
+ 218  002A            2                     ifdef   PBP
+ 218  002A            2                     MOV     A,BANK MAIN_LOOP
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                     endif  
+ 218  002A            2         endif
+ 218  002A            1                 EXECUTE EXTEND_FUNCTION_2B,059H,WORK
+ 218  002A            2         ifdef EXTEND_FUNCTION_2B
+ 218  002A            2                 ifndef WORK
+ 218  002A            2                     #define WORK
+ 218  002A            2                 endif
+ 218  002A            2                 
+ 218  002A            2                 ifdef   PBP
+ 218  002A            2                     MOV     A,BANK EXTEND_FUNCTION_2B
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 20
+
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                 endif
+ 218  002A            2                     ;-FUCNTION ID CHECK 
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 059H != 0
+ 218  002A            2                     MOV     A, 059H
+ 218  002A            2                     MOV     _FUNCTION_ID,A
+ 218  002A            2                     endif     
+ 218  002A            2                 endif
+ 218  002A            2                     ;--------------- 
+ 218  002A            2                     CALL EXTEND_FUNCTION_2B
+ 218  002A            2                     ;---------------
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 059H != 0
+ 218  002A            2                     MOV     A, 059H
+ 218  002A            2                     XOR     A,_FUNCTION_ID
+ 218  002A            2                     SZ [05H]
+ 218  002A            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 218  002A            2                     endif
+ 218  002A            2                 endif     
+ 218  002A            2                     ifdef   PBP
+ 218  002A            2                     MOV     A,BANK MAIN_LOOP
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                     endif  
+ 218  002A            2         endif
+ 218  002A            1                 EXECUTE EXTEND_FUNCTION_2C,05AH,WORK
+ 218  002A            2         ifdef EXTEND_FUNCTION_2C
+ 218  002A            2                 ifndef WORK
+ 218  002A            2                     #define WORK
+ 218  002A            2                 endif
+ 218  002A            2                 
+ 218  002A            2                 ifdef   PBP
+ 218  002A            2                     MOV     A,BANK EXTEND_FUNCTION_2C
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                 endif
+ 218  002A            2                     ;-FUCNTION ID CHECK 
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 05AH != 0
+ 218  002A            2                     MOV     A, 05AH
+ 218  002A            2                     MOV     _FUNCTION_ID,A
+ 218  002A            2                     endif     
+ 218  002A            2                 endif
+ 218  002A            2                     ;--------------- 
+ 218  002A            2                     CALL EXTEND_FUNCTION_2C
+ 218  002A            2                     ;---------------
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 05AH != 0
+ 218  002A            2                     MOV     A, 05AH
+ 218  002A            2                     XOR     A,_FUNCTION_ID
+ 218  002A            2                     SZ [05H]
+ 218  002A            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 218  002A            2                     endif
+ 218  002A            2                 endif     
+ 218  002A            2                     ifdef   PBP
+ 218  002A            2                     MOV     A,BANK MAIN_LOOP
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                     endif  
+ 218  002A            2         endif
+ 218  002A            1                 EXECUTE EXTEND_FUNCTION_2D,05BH,WORK
+ 218  002A            2         ifdef EXTEND_FUNCTION_2D
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 21
+
+ 218  002A            2                 ifndef WORK
+ 218  002A            2                     #define WORK
+ 218  002A            2                 endif
+ 218  002A            2                 
+ 218  002A            2                 ifdef   PBP
+ 218  002A            2                     MOV     A,BANK EXTEND_FUNCTION_2D
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                 endif
+ 218  002A            2                     ;-FUCNTION ID CHECK 
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 05BH != 0
+ 218  002A            2                     MOV     A, 05BH
+ 218  002A            2                     MOV     _FUNCTION_ID,A
+ 218  002A            2                     endif     
+ 218  002A            2                 endif
+ 218  002A            2                     ;--------------- 
+ 218  002A            2                     CALL EXTEND_FUNCTION_2D
+ 218  002A            2                     ;---------------
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 05BH != 0
+ 218  002A            2                     MOV     A, 05BH
+ 218  002A            2                     XOR     A,_FUNCTION_ID
+ 218  002A            2                     SZ [05H]
+ 218  002A            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 218  002A            2                     endif
+ 218  002A            2                 endif     
+ 218  002A            2                     ifdef   PBP
+ 218  002A            2                     MOV     A,BANK MAIN_LOOP
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                     endif  
+ 218  002A            2         endif
+ 218  002A            1                 EXECUTE EXTEND_FUNCTION_2E,05CH,WORK
+ 218  002A            2         ifdef EXTEND_FUNCTION_2E
+ 218  002A            2                 ifndef WORK
+ 218  002A            2                     #define WORK
+ 218  002A            2                 endif
+ 218  002A            2                 
+ 218  002A            2                 ifdef   PBP
+ 218  002A            2                     MOV     A,BANK EXTEND_FUNCTION_2E
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                 endif
+ 218  002A            2                     ;-FUCNTION ID CHECK 
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 05CH != 0
+ 218  002A            2                     MOV     A, 05CH
+ 218  002A            2                     MOV     _FUNCTION_ID,A
+ 218  002A            2                     endif     
+ 218  002A            2                 endif
+ 218  002A            2                     ;--------------- 
+ 218  002A            2                     CALL EXTEND_FUNCTION_2E
+ 218  002A            2                     ;---------------
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 05CH != 0
+ 218  002A            2                     MOV     A, 05CH
+ 218  002A            2                     XOR     A,_FUNCTION_ID
+ 218  002A            2                     SZ [05H]
+ 218  002A            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 218  002A            2                     endif
+ 218  002A            2                 endif     
+ 218  002A            2                     ifdef   PBP
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 22
+
+ 218  002A            2                     MOV     A,BANK MAIN_LOOP
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                     endif  
+ 218  002A            2         endif
+ 218  002A            1                 EXECUTE EXTEND_FUNCTION_2F,05DH,WORK
+ 218  002A            2         ifdef EXTEND_FUNCTION_2F
+ 218  002A            2                 ifndef WORK
+ 218  002A            2                     #define WORK
+ 218  002A            2                 endif
+ 218  002A            2                 
+ 218  002A            2                 ifdef   PBP
+ 218  002A            2                     MOV     A,BANK EXTEND_FUNCTION_2F
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                 endif
+ 218  002A            2                     ;-FUCNTION ID CHECK 
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 05DH != 0
+ 218  002A            2                     MOV     A, 05DH
+ 218  002A            2                     MOV     _FUNCTION_ID,A
+ 218  002A            2                     endif     
+ 218  002A            2                 endif
+ 218  002A            2                     ;--------------- 
+ 218  002A            2                     CALL EXTEND_FUNCTION_2F
+ 218  002A            2                     ;---------------
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 05DH != 0
+ 218  002A            2                     MOV     A, 05DH
+ 218  002A            2                     XOR     A,_FUNCTION_ID
+ 218  002A            2                     SZ [05H]
+ 218  002A            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 218  002A            2                     endif
+ 218  002A            2                 endif     
+ 218  002A            2                     ifdef   PBP
+ 218  002A            2                     MOV     A,BANK MAIN_LOOP
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                     endif  
+ 218  002A            2         endif
+ 218  002A            1                 EXECUTE EXTEND_FUNCTION_2G,05EH,WORK
+ 218  002A            2         ifdef EXTEND_FUNCTION_2G
+ 218  002A            2                 ifndef WORK
+ 218  002A            2                     #define WORK
+ 218  002A            2                 endif
+ 218  002A            2                 
+ 218  002A            2                 ifdef   PBP
+ 218  002A            2                     MOV     A,BANK EXTEND_FUNCTION_2G
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                 endif
+ 218  002A            2                     ;-FUCNTION ID CHECK 
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 05EH != 0
+ 218  002A            2                     MOV     A, 05EH
+ 218  002A            2                     MOV     _FUNCTION_ID,A
+ 218  002A            2                     endif     
+ 218  002A            2                 endif
+ 218  002A            2                     ;--------------- 
+ 218  002A            2                     CALL EXTEND_FUNCTION_2G
+ 218  002A            2                     ;---------------
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 05EH != 0
+ 218  002A            2                     MOV     A, 05EH
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 23
+
+ 218  002A            2                     XOR     A,_FUNCTION_ID
+ 218  002A            2                     SZ [05H]
+ 218  002A            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 218  002A            2                     endif
+ 218  002A            2                 endif     
+ 218  002A            2                     ifdef   PBP
+ 218  002A            2                     MOV     A,BANK MAIN_LOOP
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                     endif  
+ 218  002A            2         endif
+ 218  002A            1                 EXECUTE EXTEND_FUNCTION_2H,05FH,WORK
+ 218  002A            2         ifdef EXTEND_FUNCTION_2H
+ 218  002A            2                 ifndef WORK
+ 218  002A            2                     #define WORK
+ 218  002A            2                 endif
+ 218  002A            2                 
+ 218  002A            2                 ifdef   PBP
+ 218  002A            2                     MOV     A,BANK EXTEND_FUNCTION_2H
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                 endif
+ 218  002A            2                     ;-FUCNTION ID CHECK 
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 05FH != 0
+ 218  002A            2                     MOV     A, 05FH
+ 218  002A            2                     MOV     _FUNCTION_ID,A
+ 218  002A            2                     endif     
+ 218  002A            2                 endif
+ 218  002A            2                     ;--------------- 
+ 218  002A            2                     CALL EXTEND_FUNCTION_2H
+ 218  002A            2                     ;---------------
+ 218  002A            2                 ifndef      ESCfunctionIDcheck
+ 218  002A            2                     if 05FH != 0
+ 218  002A            2                     MOV     A, 05FH
+ 218  002A            2                     XOR     A,_FUNCTION_ID
+ 218  002A            2                     SZ [05H]
+ 218  002A            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 218  002A            2                     endif
+ 218  002A            2                 endif     
+ 218  002A            2                     ifdef   PBP
+ 218  002A            2                     MOV     A,BANK MAIN_LOOP
+ 218  002A            2                     MOV     PBP,A
+ 218  002A            2                     endif  
+ 218  002A            2         endif
+ 219  002A                          
+ 220  002A                          
+ 221  002A                          
+ 222  002A                      ifdef   PBP
+ 223  002A                              MOV     BANK MAIN_LOOP
+ 224  002A                              MOV     PBP,A
+ 225  002A                      endif
+ 226  002A                          
+ 227  002A  3800     R                  SNZ     _HALT_STATE.7       ;CHECK ALL PROGRAM CONTORL _HALT_STATE
+ 228  002B  3800     R                  SNZ     _HALT_STATE.0
+ 229  002C  2800     R                  JMP     MAIN_LOOP
+ 230  002D                              
+ 231  002D                              ;----------------------
+ 232  002D              ENTER_HALT_MODE:;-HALE INITIAL FUNCTION
+ 233  002D                              ;----------------------
+ 234  002D                              ;--------------------
+ 235  002D              WDT_WAKEUP:     ;-WDT WAKEUP FUNCTION     
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 24
+
+ 236  002D                              ;--------------------
+ 237  002D                              
+ 238  002D  1F80     R                  SET     _HALT_STATE
+ 239  002E                              
+ 240  002E                              EXTEND_FUNCTION_HALT_PREPARE
+ 240  002E            1                 EXECUTE EXTEND_FUNCTION_1A_HALT_PREPARE,070H,DEF_HALT_PREPARE
+ 240  002E            2         ifdef EXTEND_FUNCTION_1A_HALT_PREPARE
+ 240  002E            2                 ifndef DEF_HALT_PREPARE
+ 240  002E            2                     #define DEF_HALT_PREPARE
+ 240  002E            2                 endif
+ 240  002E            2                 
+ 240  002E            2                 ifdef   PBP
+ 240  002E            2                     MOV     A,BANK _BS84B08C_CTOUCH_HALT_PREPARE
+ 240  002E            2                     MOV     PBP,A
+ 240  002E            2                 endif
+ 240  002E            2                     ;-FUCNTION ID CHECK 
+ 240  002E            2                 ifndef      ESCfunctionIDcheck
+ 240  002E            2                     if 070H != 0
+ 240  002E            2                     MOV     A, 070H
+ 240  002E            2                     MOV     _FUNCTION_ID,A
+ 240  002E            2                     endif     
+ 240  002E            2                 endif
+ 240  002E            2                     ;--------------- 
+ 240  002E  2000     R2                     CALL _BS84B08C_CTOUCH_HALT_PREPARE
+ 240  002F            2                     ;---------------
+ 240  002F            2                 ifndef      ESCfunctionIDcheck
+ 240  002F            2                     if 070H != 0
+ 240  002F            2                     MOV     A, 070H
+ 240  002F            2                     XOR     A,_FUNCTION_ID
+ 240  002F            2                     SZ [05H]
+ 240  002F            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 240  002F            2                     endif
+ 240  002F            2                 endif     
+ 240  002F            2                     ifdef   PBP
+ 240  002F            2                     MOV     A,BANK MAIN_LOOP
+ 240  002F            2                     MOV     PBP,A
+ 240  002F            2                     endif  
+ 240  002F            2         endif
+ 240  002F            1                 EXECUTE EXTEND_FUNCTION_1B_HALT_PREPARE,071H,DEF_HALT_PREPARE
+ 240  002F            2         ifdef EXTEND_FUNCTION_1B_HALT_PREPARE
+ 240  002F            2                 ifndef DEF_HALT_PREPARE
+ 240  002F            2                     #define DEF_HALT_PREPARE
+ 240  002F            2                 endif
+ 240  002F            2                 
+ 240  002F            2                 ifdef   PBP
+ 240  002F            2                     MOV     A,BANK EXTEND_FUNCTION_1B_HALT_PREPARE
+ 240  002F            2                     MOV     PBP,A
+ 240  002F            2                 endif
+ 240  002F            2                     ;-FUCNTION ID CHECK 
+ 240  002F            2                 ifndef      ESCfunctionIDcheck
+ 240  002F            2                     if 071H != 0
+ 240  002F            2                     MOV     A, 071H
+ 240  002F            2                     MOV     _FUNCTION_ID,A
+ 240  002F            2                     endif     
+ 240  002F            2                 endif
+ 240  002F            2                     ;--------------- 
+ 240  002F            2                     CALL EXTEND_FUNCTION_1B_HALT_PREPARE
+ 240  002F            2                     ;---------------
+ 240  002F            2                 ifndef      ESCfunctionIDcheck
+ 240  002F            2                     if 071H != 0
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 25
+
+ 240  002F            2                     MOV     A, 071H
+ 240  002F            2                     XOR     A,_FUNCTION_ID
+ 240  002F            2                     SZ [05H]
+ 240  002F            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 240  002F            2                     endif
+ 240  002F            2                 endif     
+ 240  002F            2                     ifdef   PBP
+ 240  002F            2                     MOV     A,BANK MAIN_LOOP
+ 240  002F            2                     MOV     PBP,A
+ 240  002F            2                     endif  
+ 240  002F            2         endif
+ 240  002F            1                 EXECUTE EXTEND_FUNCTION_1C_HALT_PREPARE,072H,DEF_HALT_PREPARE
+ 240  002F            2         ifdef EXTEND_FUNCTION_1C_HALT_PREPARE
+ 240  002F            2                 ifndef DEF_HALT_PREPARE
+ 240  002F            2                     #define DEF_HALT_PREPARE
+ 240  002F            2                 endif
+ 240  002F            2                 
+ 240  002F            2                 ifdef   PBP
+ 240  002F            2                     MOV     A,BANK EXTEND_FUNCTION_1C_HALT_PREPARE
+ 240  002F            2                     MOV     PBP,A
+ 240  002F            2                 endif
+ 240  002F            2                     ;-FUCNTION ID CHECK 
+ 240  002F            2                 ifndef      ESCfunctionIDcheck
+ 240  002F            2                     if 072H != 0
+ 240  002F            2                     MOV     A, 072H
+ 240  002F            2                     MOV     _FUNCTION_ID,A
+ 240  002F            2                     endif     
+ 240  002F            2                 endif
+ 240  002F            2                     ;--------------- 
+ 240  002F            2                     CALL EXTEND_FUNCTION_1C_HALT_PREPARE
+ 240  002F            2                     ;---------------
+ 240  002F            2                 ifndef      ESCfunctionIDcheck
+ 240  002F            2                     if 072H != 0
+ 240  002F            2                     MOV     A, 072H
+ 240  002F            2                     XOR     A,_FUNCTION_ID
+ 240  002F            2                     SZ [05H]
+ 240  002F            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 240  002F            2                     endif
+ 240  002F            2                 endif     
+ 240  002F            2                     ifdef   PBP
+ 240  002F            2                     MOV     A,BANK MAIN_LOOP
+ 240  002F            2                     MOV     PBP,A
+ 240  002F            2                     endif  
+ 240  002F            2         endif
+ 240  002F            1                 EXECUTE EXTEND_FUNCTION_1D_HALT_PREPARE,073H,DEF_HALT_PREPARE
+ 240  002F            2         ifdef EXTEND_FUNCTION_1D_HALT_PREPARE
+ 240  002F            2                 ifndef DEF_HALT_PREPARE
+ 240  002F            2                     #define DEF_HALT_PREPARE
+ 240  002F            2                 endif
+ 240  002F            2                 
+ 240  002F            2                 ifdef   PBP
+ 240  002F            2                     MOV     A,BANK _USER_PROGRAM_HALT_PREPARE
+ 240  002F            2                     MOV     PBP,A
+ 240  002F            2                 endif
+ 240  002F            2                     ;-FUCNTION ID CHECK 
+ 240  002F            2                 ifndef      ESCfunctionIDcheck
+ 240  002F            2                     if 073H != 0
+ 240  002F            2                     MOV     A, 073H
+ 240  002F            2                     MOV     _FUNCTION_ID,A
+ 240  002F            2                     endif     
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 26
+
+ 240  002F            2                 endif
+ 240  002F            2                     ;--------------- 
+ 240  002F  2000     E2                     CALL _USER_PROGRAM_HALT_PREPARE
+ 240  0030            2                     ;---------------
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 073H != 0
+ 240  0030            2                     MOV     A, 073H
+ 240  0030            2                     XOR     A,_FUNCTION_ID
+ 240  0030            2                     SZ [05H]
+ 240  0030            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 240  0030            2                     endif
+ 240  0030            2                 endif     
+ 240  0030            2                     ifdef   PBP
+ 240  0030            2                     MOV     A,BANK MAIN_LOOP
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                     endif  
+ 240  0030            2         endif
+ 240  0030            1                 EXECUTE EXTEND_FUNCTION_1E_HALT_PREPARE,074H,DEF_HALT_PREPARE
+ 240  0030            2         ifdef EXTEND_FUNCTION_1E_HALT_PREPARE
+ 240  0030            2                 ifndef DEF_HALT_PREPARE
+ 240  0030            2                     #define DEF_HALT_PREPARE
+ 240  0030            2                 endif
+ 240  0030            2                 
+ 240  0030            2                 ifdef   PBP
+ 240  0030            2                     MOV     A,BANK EXTEND_FUNCTION_1E_HALT_PREPARE
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                 endif
+ 240  0030            2                     ;-FUCNTION ID CHECK 
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 074H != 0
+ 240  0030            2                     MOV     A, 074H
+ 240  0030            2                     MOV     _FUNCTION_ID,A
+ 240  0030            2                     endif     
+ 240  0030            2                 endif
+ 240  0030            2                     ;--------------- 
+ 240  0030            2                     CALL EXTEND_FUNCTION_1E_HALT_PREPARE
+ 240  0030            2                     ;---------------
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 074H != 0
+ 240  0030            2                     MOV     A, 074H
+ 240  0030            2                     XOR     A,_FUNCTION_ID
+ 240  0030            2                     SZ [05H]
+ 240  0030            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 240  0030            2                     endif
+ 240  0030            2                 endif     
+ 240  0030            2                     ifdef   PBP
+ 240  0030            2                     MOV     A,BANK MAIN_LOOP
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                     endif  
+ 240  0030            2         endif
+ 240  0030            1                 EXECUTE EXTEND_FUNCTION_1F_HALT_PREPARE,075H,DEF_HALT_PREPARE
+ 240  0030            2         ifdef EXTEND_FUNCTION_1F_HALT_PREPARE
+ 240  0030            2                 ifndef DEF_HALT_PREPARE
+ 240  0030            2                     #define DEF_HALT_PREPARE
+ 240  0030            2                 endif
+ 240  0030            2                 
+ 240  0030            2                 ifdef   PBP
+ 240  0030            2                     MOV     A,BANK EXTEND_FUNCTION_1F_HALT_PREPARE
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                 endif
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 27
+
+ 240  0030            2                     ;-FUCNTION ID CHECK 
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 075H != 0
+ 240  0030            2                     MOV     A, 075H
+ 240  0030            2                     MOV     _FUNCTION_ID,A
+ 240  0030            2                     endif     
+ 240  0030            2                 endif
+ 240  0030            2                     ;--------------- 
+ 240  0030            2                     CALL EXTEND_FUNCTION_1F_HALT_PREPARE
+ 240  0030            2                     ;---------------
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 075H != 0
+ 240  0030            2                     MOV     A, 075H
+ 240  0030            2                     XOR     A,_FUNCTION_ID
+ 240  0030            2                     SZ [05H]
+ 240  0030            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 240  0030            2                     endif
+ 240  0030            2                 endif     
+ 240  0030            2                     ifdef   PBP
+ 240  0030            2                     MOV     A,BANK MAIN_LOOP
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                     endif  
+ 240  0030            2         endif
+ 240  0030            1                 EXECUTE EXTEND_FUNCTION_1G_HALT_PREPARE,076H,DEF_HALT_PREPARE
+ 240  0030            2         ifdef EXTEND_FUNCTION_1G_HALT_PREPARE
+ 240  0030            2                 ifndef DEF_HALT_PREPARE
+ 240  0030            2                     #define DEF_HALT_PREPARE
+ 240  0030            2                 endif
+ 240  0030            2                 
+ 240  0030            2                 ifdef   PBP
+ 240  0030            2                     MOV     A,BANK EXTEND_FUNCTION_1G_HALT_PREPARE
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                 endif
+ 240  0030            2                     ;-FUCNTION ID CHECK 
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 076H != 0
+ 240  0030            2                     MOV     A, 076H
+ 240  0030            2                     MOV     _FUNCTION_ID,A
+ 240  0030            2                     endif     
+ 240  0030            2                 endif
+ 240  0030            2                     ;--------------- 
+ 240  0030            2                     CALL EXTEND_FUNCTION_1G_HALT_PREPARE
+ 240  0030            2                     ;---------------
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 076H != 0
+ 240  0030            2                     MOV     A, 076H
+ 240  0030            2                     XOR     A,_FUNCTION_ID
+ 240  0030            2                     SZ [05H]
+ 240  0030            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 240  0030            2                     endif
+ 240  0030            2                 endif     
+ 240  0030            2                     ifdef   PBP
+ 240  0030            2                     MOV     A,BANK MAIN_LOOP
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                     endif  
+ 240  0030            2         endif
+ 240  0030            1                 EXECUTE EXTEND_FUNCTION_1H_HALT_PREPARE,077H,DEF_HALT_PREPARE
+ 240  0030            2         ifdef EXTEND_FUNCTION_1H_HALT_PREPARE
+ 240  0030            2                 ifndef DEF_HALT_PREPARE
+ 240  0030            2                     #define DEF_HALT_PREPARE
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 28
+
+ 240  0030            2                 endif
+ 240  0030            2                 
+ 240  0030            2                 ifdef   PBP
+ 240  0030            2                     MOV     A,BANK EXTEND_FUNCTION_1H_HALT_PREPARE
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                 endif
+ 240  0030            2                     ;-FUCNTION ID CHECK 
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 077H != 0
+ 240  0030            2                     MOV     A, 077H
+ 240  0030            2                     MOV     _FUNCTION_ID,A
+ 240  0030            2                     endif     
+ 240  0030            2                 endif
+ 240  0030            2                     ;--------------- 
+ 240  0030            2                     CALL EXTEND_FUNCTION_1H_HALT_PREPARE
+ 240  0030            2                     ;---------------
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 077H != 0
+ 240  0030            2                     MOV     A, 077H
+ 240  0030            2                     XOR     A,_FUNCTION_ID
+ 240  0030            2                     SZ [05H]
+ 240  0030            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 240  0030            2                     endif
+ 240  0030            2                 endif     
+ 240  0030            2                     ifdef   PBP
+ 240  0030            2                     MOV     A,BANK MAIN_LOOP
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                     endif  
+ 240  0030            2         endif
+ 240  0030            1                 EXECUTE EXTEND_FUNCTION_2A_HALT_PREPARE,078H,DEF_HALT_PREPARE
+ 240  0030            2         ifdef EXTEND_FUNCTION_2A_HALT_PREPARE
+ 240  0030            2                 ifndef DEF_HALT_PREPARE
+ 240  0030            2                     #define DEF_HALT_PREPARE
+ 240  0030            2                 endif
+ 240  0030            2                 
+ 240  0030            2                 ifdef   PBP
+ 240  0030            2                     MOV     A,BANK EXTEND_FUNCTION_2A_HALT_PREPARE
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                 endif
+ 240  0030            2                     ;-FUCNTION ID CHECK 
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 078H != 0
+ 240  0030            2                     MOV     A, 078H
+ 240  0030            2                     MOV     _FUNCTION_ID,A
+ 240  0030            2                     endif     
+ 240  0030            2                 endif
+ 240  0030            2                     ;--------------- 
+ 240  0030            2                     CALL EXTEND_FUNCTION_2A_HALT_PREPARE
+ 240  0030            2                     ;---------------
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 078H != 0
+ 240  0030            2                     MOV     A, 078H
+ 240  0030            2                     XOR     A,_FUNCTION_ID
+ 240  0030            2                     SZ [05H]
+ 240  0030            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 240  0030            2                     endif
+ 240  0030            2                 endif     
+ 240  0030            2                     ifdef   PBP
+ 240  0030            2                     MOV     A,BANK MAIN_LOOP
+ 240  0030            2                     MOV     PBP,A
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 29
+
+ 240  0030            2                     endif  
+ 240  0030            2         endif
+ 240  0030            1                 EXECUTE EXTEND_FUNCTION_2B_HALT_PREPARE,079H,DEF_HALT_PREPARE
+ 240  0030            2         ifdef EXTEND_FUNCTION_2B_HALT_PREPARE
+ 240  0030            2                 ifndef DEF_HALT_PREPARE
+ 240  0030            2                     #define DEF_HALT_PREPARE
+ 240  0030            2                 endif
+ 240  0030            2                 
+ 240  0030            2                 ifdef   PBP
+ 240  0030            2                     MOV     A,BANK EXTEND_FUNCTION_2B_HALT_PREPARE
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                 endif
+ 240  0030            2                     ;-FUCNTION ID CHECK 
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 079H != 0
+ 240  0030            2                     MOV     A, 079H
+ 240  0030            2                     MOV     _FUNCTION_ID,A
+ 240  0030            2                     endif     
+ 240  0030            2                 endif
+ 240  0030            2                     ;--------------- 
+ 240  0030            2                     CALL EXTEND_FUNCTION_2B_HALT_PREPARE
+ 240  0030            2                     ;---------------
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 079H != 0
+ 240  0030            2                     MOV     A, 079H
+ 240  0030            2                     XOR     A,_FUNCTION_ID
+ 240  0030            2                     SZ [05H]
+ 240  0030            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 240  0030            2                     endif
+ 240  0030            2                 endif     
+ 240  0030            2                     ifdef   PBP
+ 240  0030            2                     MOV     A,BANK MAIN_LOOP
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                     endif  
+ 240  0030            2         endif
+ 240  0030            1                 EXECUTE EXTEND_FUNCTION_2C_HALT_PREPARE,07AH,DEF_HALT_PREPARE
+ 240  0030            2         ifdef EXTEND_FUNCTION_2C_HALT_PREPARE
+ 240  0030            2                 ifndef DEF_HALT_PREPARE
+ 240  0030            2                     #define DEF_HALT_PREPARE
+ 240  0030            2                 endif
+ 240  0030            2                 
+ 240  0030            2                 ifdef   PBP
+ 240  0030            2                     MOV     A,BANK EXTEND_FUNCTION_2C_HALT_PREPARE
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                 endif
+ 240  0030            2                     ;-FUCNTION ID CHECK 
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 07AH != 0
+ 240  0030            2                     MOV     A, 07AH
+ 240  0030            2                     MOV     _FUNCTION_ID,A
+ 240  0030            2                     endif     
+ 240  0030            2                 endif
+ 240  0030            2                     ;--------------- 
+ 240  0030            2                     CALL EXTEND_FUNCTION_2C_HALT_PREPARE
+ 240  0030            2                     ;---------------
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 07AH != 0
+ 240  0030            2                     MOV     A, 07AH
+ 240  0030            2                     XOR     A,_FUNCTION_ID
+ 240  0030            2                     SZ [05H]
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 30
+
+ 240  0030            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 240  0030            2                     endif
+ 240  0030            2                 endif     
+ 240  0030            2                     ifdef   PBP
+ 240  0030            2                     MOV     A,BANK MAIN_LOOP
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                     endif  
+ 240  0030            2         endif
+ 240  0030            1                 EXECUTE EXTEND_FUNCTION_2D_HALT_PREPARE,07BH,DEF_HALT_PREPARE
+ 240  0030            2         ifdef EXTEND_FUNCTION_2D_HALT_PREPARE
+ 240  0030            2                 ifndef DEF_HALT_PREPARE
+ 240  0030            2                     #define DEF_HALT_PREPARE
+ 240  0030            2                 endif
+ 240  0030            2                 
+ 240  0030            2                 ifdef   PBP
+ 240  0030            2                     MOV     A,BANK EXTEND_FUNCTION_2D_HALT_PREPARE
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                 endif
+ 240  0030            2                     ;-FUCNTION ID CHECK 
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 07BH != 0
+ 240  0030            2                     MOV     A, 07BH
+ 240  0030            2                     MOV     _FUNCTION_ID,A
+ 240  0030            2                     endif     
+ 240  0030            2                 endif
+ 240  0030            2                     ;--------------- 
+ 240  0030            2                     CALL EXTEND_FUNCTION_2D_HALT_PREPARE
+ 240  0030            2                     ;---------------
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 07BH != 0
+ 240  0030            2                     MOV     A, 07BH
+ 240  0030            2                     XOR     A,_FUNCTION_ID
+ 240  0030            2                     SZ [05H]
+ 240  0030            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 240  0030            2                     endif
+ 240  0030            2                 endif     
+ 240  0030            2                     ifdef   PBP
+ 240  0030            2                     MOV     A,BANK MAIN_LOOP
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                     endif  
+ 240  0030            2         endif
+ 240  0030            1                 EXECUTE EXTEND_FUNCTION_2E_HALT_PREPARE,07CH,DEF_HALT_PREPARE
+ 240  0030            2         ifdef EXTEND_FUNCTION_2E_HALT_PREPARE
+ 240  0030            2                 ifndef DEF_HALT_PREPARE
+ 240  0030            2                     #define DEF_HALT_PREPARE
+ 240  0030            2                 endif
+ 240  0030            2                 
+ 240  0030            2                 ifdef   PBP
+ 240  0030            2                     MOV     A,BANK EXTEND_FUNCTION_2E_HALT_PREPARE
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                 endif
+ 240  0030            2                     ;-FUCNTION ID CHECK 
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 07CH != 0
+ 240  0030            2                     MOV     A, 07CH
+ 240  0030            2                     MOV     _FUNCTION_ID,A
+ 240  0030            2                     endif     
+ 240  0030            2                 endif
+ 240  0030            2                     ;--------------- 
+ 240  0030            2                     CALL EXTEND_FUNCTION_2E_HALT_PREPARE
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 31
+
+ 240  0030            2                     ;---------------
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 07CH != 0
+ 240  0030            2                     MOV     A, 07CH
+ 240  0030            2                     XOR     A,_FUNCTION_ID
+ 240  0030            2                     SZ [05H]
+ 240  0030            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 240  0030            2                     endif
+ 240  0030            2                 endif     
+ 240  0030            2                     ifdef   PBP
+ 240  0030            2                     MOV     A,BANK MAIN_LOOP
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                     endif  
+ 240  0030            2         endif
+ 240  0030            1                 EXECUTE EXTEND_FUNCTION_2F_HALT_PREPARE,07DH,DEF_HALT_PREPARE
+ 240  0030            2         ifdef EXTEND_FUNCTION_2F_HALT_PREPARE
+ 240  0030            2                 ifndef DEF_HALT_PREPARE
+ 240  0030            2                     #define DEF_HALT_PREPARE
+ 240  0030            2                 endif
+ 240  0030            2                 
+ 240  0030            2                 ifdef   PBP
+ 240  0030            2                     MOV     A,BANK EXTEND_FUNCTION_2F_HALT_PREPARE
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                 endif
+ 240  0030            2                     ;-FUCNTION ID CHECK 
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 07DH != 0
+ 240  0030            2                     MOV     A, 07DH
+ 240  0030            2                     MOV     _FUNCTION_ID,A
+ 240  0030            2                     endif     
+ 240  0030            2                 endif
+ 240  0030            2                     ;--------------- 
+ 240  0030            2                     CALL EXTEND_FUNCTION_2F_HALT_PREPARE
+ 240  0030            2                     ;---------------
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 07DH != 0
+ 240  0030            2                     MOV     A, 07DH
+ 240  0030            2                     XOR     A,_FUNCTION_ID
+ 240  0030            2                     SZ [05H]
+ 240  0030            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 240  0030            2                     endif
+ 240  0030            2                 endif     
+ 240  0030            2                     ifdef   PBP
+ 240  0030            2                     MOV     A,BANK MAIN_LOOP
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                     endif  
+ 240  0030            2         endif
+ 240  0030            1                 EXECUTE EXTEND_FUNCTION_2G_HALT_PREPARE,07EH,DEF_HALT_PREPARE
+ 240  0030            2         ifdef EXTEND_FUNCTION_2G_HALT_PREPARE
+ 240  0030            2                 ifndef DEF_HALT_PREPARE
+ 240  0030            2                     #define DEF_HALT_PREPARE
+ 240  0030            2                 endif
+ 240  0030            2                 
+ 240  0030            2                 ifdef   PBP
+ 240  0030            2                     MOV     A,BANK EXTEND_FUNCTION_2G_HALT_PREPARE
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                 endif
+ 240  0030            2                     ;-FUCNTION ID CHECK 
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 07EH != 0
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 32
+
+ 240  0030            2                     MOV     A, 07EH
+ 240  0030            2                     MOV     _FUNCTION_ID,A
+ 240  0030            2                     endif     
+ 240  0030            2                 endif
+ 240  0030            2                     ;--------------- 
+ 240  0030            2                     CALL EXTEND_FUNCTION_2G_HALT_PREPARE
+ 240  0030            2                     ;---------------
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 07EH != 0
+ 240  0030            2                     MOV     A, 07EH
+ 240  0030            2                     XOR     A,_FUNCTION_ID
+ 240  0030            2                     SZ [05H]
+ 240  0030            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 240  0030            2                     endif
+ 240  0030            2                 endif     
+ 240  0030            2                     ifdef   PBP
+ 240  0030            2                     MOV     A,BANK MAIN_LOOP
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                     endif  
+ 240  0030            2         endif
+ 240  0030            1                 EXECUTE EXTEND_FUNCTION_2H_HALT_PREPARE,07FH,DEF_HALT_PREPARE
+ 240  0030            2         ifdef EXTEND_FUNCTION_2H_HALT_PREPARE
+ 240  0030            2                 ifndef DEF_HALT_PREPARE
+ 240  0030            2                     #define DEF_HALT_PREPARE
+ 240  0030            2                 endif
+ 240  0030            2                 
+ 240  0030            2                 ifdef   PBP
+ 240  0030            2                     MOV     A,BANK EXTEND_FUNCTION_2H_HALT_PREPARE
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                 endif
+ 240  0030            2                     ;-FUCNTION ID CHECK 
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 07FH != 0
+ 240  0030            2                     MOV     A, 07FH
+ 240  0030            2                     MOV     _FUNCTION_ID,A
+ 240  0030            2                     endif     
+ 240  0030            2                 endif
+ 240  0030            2                     ;--------------- 
+ 240  0030            2                     CALL EXTEND_FUNCTION_2H_HALT_PREPARE
+ 240  0030            2                     ;---------------
+ 240  0030            2                 ifndef      ESCfunctionIDcheck
+ 240  0030            2                     if 07FH != 0
+ 240  0030            2                     MOV     A, 07FH
+ 240  0030            2                     XOR     A,_FUNCTION_ID
+ 240  0030            2                     SZ [05H]
+ 240  0030            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 240  0030            2                     endif
+ 240  0030            2                 endif     
+ 240  0030            2                     ifdef   PBP
+ 240  0030            2                     MOV     A,BANK MAIN_LOOP
+ 240  0030            2                     MOV     PBP,A
+ 240  0030            2                     endif  
+ 240  0030            2         endif
+ 241  0030                              
+ 242  0030                      ifdef   PBP
+ 243  0030                              MOV     BANK PROGRAM_WAKEUP
+ 244  0030                              MOV     PBP,A
+ 245  0030                      endif
+ 246  0030                      
+ 247  0030  3800     R                  SNZ     _HALT_STATE.7       ;CHECK ALL PROGRAM CONTORL _HALT_STATE
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 33
+
+ 248  0031  3800     R                  SNZ     _HALT_STATE.0
+ 249  0032  2800     R                  JMP     PROGRAM_WAKEUP
+ 250  0033                              
+ 251  0033              ENTER_HALT:
+ 252  0033  0002                        HALT
+ 253  0034                              
+ 254  0034                              
+ 255  0034                              ;--------------------
+ 256  0034              HALT_WAKEUP:    ;-HALT WAKEUP FUNCTION     
+ 257  0034                              ;--------------------
+ 258  0034                              
+ 259  0034  1F80     R                  SET     _HALT_STATE
+ 260  0035                              
+ 261  0035                              EXTEND_FUNCTION_HALT_WAKEUP
+ 261  0035            1                 EXECUTE EXTEND_FUNCTION_1A_HALT_WAKEUP,070H,DEF_HALT_WAKEUP
+ 261  0035            2         ifdef EXTEND_FUNCTION_1A_HALT_WAKEUP
+ 261  0035            2                 ifndef DEF_HALT_WAKEUP
+ 261  0035            2                     #define DEF_HALT_WAKEUP
+ 261  0035            2                 endif
+ 261  0035            2                 
+ 261  0035            2                 ifdef   PBP
+ 261  0035            2                     MOV     A,BANK EXTEND_FUNCTION_1A_HALT_WAKEUP
+ 261  0035            2                     MOV     PBP,A
+ 261  0035            2                 endif
+ 261  0035            2                     ;-FUCNTION ID CHECK 
+ 261  0035            2                 ifndef      ESCfunctionIDcheck
+ 261  0035            2                     if 070H != 0
+ 261  0035            2                     MOV     A, 070H
+ 261  0035            2                     MOV     _FUNCTION_ID,A
+ 261  0035            2                     endif     
+ 261  0035            2                 endif
+ 261  0035            2                     ;--------------- 
+ 261  0035            2                     CALL EXTEND_FUNCTION_1A_HALT_WAKEUP
+ 261  0035            2                     ;---------------
+ 261  0035            2                 ifndef      ESCfunctionIDcheck
+ 261  0035            2                     if 070H != 0
+ 261  0035            2                     MOV     A, 070H
+ 261  0035            2                     XOR     A,_FUNCTION_ID
+ 261  0035            2                     SZ [05H]
+ 261  0035            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 261  0035            2                     endif
+ 261  0035            2                 endif     
+ 261  0035            2                     ifdef   PBP
+ 261  0035            2                     MOV     A,BANK MAIN_LOOP
+ 261  0035            2                     MOV     PBP,A
+ 261  0035            2                     endif  
+ 261  0035            2         endif
+ 261  0035            1                 EXECUTE EXTEND_FUNCTION_1B_HALT_WAKEUP,071H,DEF_HALT_WAKEUP
+ 261  0035            2         ifdef EXTEND_FUNCTION_1B_HALT_WAKEUP
+ 261  0035            2                 ifndef DEF_HALT_WAKEUP
+ 261  0035            2                     #define DEF_HALT_WAKEUP
+ 261  0035            2                 endif
+ 261  0035            2                 
+ 261  0035            2                 ifdef   PBP
+ 261  0035            2                     MOV     A,BANK EXTEND_FUNCTION_1B_HALT_WAKEUP
+ 261  0035            2                     MOV     PBP,A
+ 261  0035            2                 endif
+ 261  0035            2                     ;-FUCNTION ID CHECK 
+ 261  0035            2                 ifndef      ESCfunctionIDcheck
+ 261  0035            2                     if 071H != 0
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 34
+
+ 261  0035            2                     MOV     A, 071H
+ 261  0035            2                     MOV     _FUNCTION_ID,A
+ 261  0035            2                     endif     
+ 261  0035            2                 endif
+ 261  0035            2                     ;--------------- 
+ 261  0035            2                     CALL EXTEND_FUNCTION_1B_HALT_WAKEUP
+ 261  0035            2                     ;---------------
+ 261  0035            2                 ifndef      ESCfunctionIDcheck
+ 261  0035            2                     if 071H != 0
+ 261  0035            2                     MOV     A, 071H
+ 261  0035            2                     XOR     A,_FUNCTION_ID
+ 261  0035            2                     SZ [05H]
+ 261  0035            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 261  0035            2                     endif
+ 261  0035            2                 endif     
+ 261  0035            2                     ifdef   PBP
+ 261  0035            2                     MOV     A,BANK MAIN_LOOP
+ 261  0035            2                     MOV     PBP,A
+ 261  0035            2                     endif  
+ 261  0035            2         endif
+ 261  0035            1                 EXECUTE EXTEND_FUNCTION_1C_HALT_WAKEUP,072H,DEF_HALT_WAKEUP
+ 261  0035            2         ifdef EXTEND_FUNCTION_1C_HALT_WAKEUP
+ 261  0035            2                 ifndef DEF_HALT_WAKEUP
+ 261  0035            2                     #define DEF_HALT_WAKEUP
+ 261  0035            2                 endif
+ 261  0035            2                 
+ 261  0035            2                 ifdef   PBP
+ 261  0035            2                     MOV     A,BANK EXTEND_FUNCTION_1C_HALT_WAKEUP
+ 261  0035            2                     MOV     PBP,A
+ 261  0035            2                 endif
+ 261  0035            2                     ;-FUCNTION ID CHECK 
+ 261  0035            2                 ifndef      ESCfunctionIDcheck
+ 261  0035            2                     if 072H != 0
+ 261  0035            2                     MOV     A, 072H
+ 261  0035            2                     MOV     _FUNCTION_ID,A
+ 261  0035            2                     endif     
+ 261  0035            2                 endif
+ 261  0035            2                     ;--------------- 
+ 261  0035            2                     CALL EXTEND_FUNCTION_1C_HALT_WAKEUP
+ 261  0035            2                     ;---------------
+ 261  0035            2                 ifndef      ESCfunctionIDcheck
+ 261  0035            2                     if 072H != 0
+ 261  0035            2                     MOV     A, 072H
+ 261  0035            2                     XOR     A,_FUNCTION_ID
+ 261  0035            2                     SZ [05H]
+ 261  0035            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 261  0035            2                     endif
+ 261  0035            2                 endif     
+ 261  0035            2                     ifdef   PBP
+ 261  0035            2                     MOV     A,BANK MAIN_LOOP
+ 261  0035            2                     MOV     PBP,A
+ 261  0035            2                     endif  
+ 261  0035            2         endif
+ 261  0035            1                 EXECUTE EXTEND_FUNCTION_1D_HALT_WAKEUP,073H,DEF_HALT_WAKEUP
+ 261  0035            2         ifdef EXTEND_FUNCTION_1D_HALT_WAKEUP
+ 261  0035            2                 ifndef DEF_HALT_WAKEUP
+ 261  0035            2                     #define DEF_HALT_WAKEUP
+ 261  0035            2                 endif
+ 261  0035            2                 
+ 261  0035            2                 ifdef   PBP
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 35
+
+ 261  0035            2                     MOV     A,BANK _USER_PROGRAM_HALT_WAKEUP
+ 261  0035            2                     MOV     PBP,A
+ 261  0035            2                 endif
+ 261  0035            2                     ;-FUCNTION ID CHECK 
+ 261  0035            2                 ifndef      ESCfunctionIDcheck
+ 261  0035            2                     if 073H != 0
+ 261  0035            2                     MOV     A, 073H
+ 261  0035            2                     MOV     _FUNCTION_ID,A
+ 261  0035            2                     endif     
+ 261  0035            2                 endif
+ 261  0035            2                     ;--------------- 
+ 261  0035  2000     E2                     CALL _USER_PROGRAM_HALT_WAKEUP
+ 261  0036            2                     ;---------------
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 073H != 0
+ 261  0036            2                     MOV     A, 073H
+ 261  0036            2                     XOR     A,_FUNCTION_ID
+ 261  0036            2                     SZ [05H]
+ 261  0036            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 261  0036            2                     endif
+ 261  0036            2                 endif     
+ 261  0036            2                     ifdef   PBP
+ 261  0036            2                     MOV     A,BANK MAIN_LOOP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                     endif  
+ 261  0036            2         endif
+ 261  0036            1                 EXECUTE EXTEND_FUNCTION_1E_HALT_WAKEUP,074H,DEF_HALT_WAKEUP
+ 261  0036            2         ifdef EXTEND_FUNCTION_1E_HALT_WAKEUP
+ 261  0036            2                 ifndef DEF_HALT_WAKEUP
+ 261  0036            2                     #define DEF_HALT_WAKEUP
+ 261  0036            2                 endif
+ 261  0036            2                 
+ 261  0036            2                 ifdef   PBP
+ 261  0036            2                     MOV     A,BANK EXTEND_FUNCTION_1E_HALT_WAKEUP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                 endif
+ 261  0036            2                     ;-FUCNTION ID CHECK 
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 074H != 0
+ 261  0036            2                     MOV     A, 074H
+ 261  0036            2                     MOV     _FUNCTION_ID,A
+ 261  0036            2                     endif     
+ 261  0036            2                 endif
+ 261  0036            2                     ;--------------- 
+ 261  0036            2                     CALL EXTEND_FUNCTION_1E_HALT_WAKEUP
+ 261  0036            2                     ;---------------
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 074H != 0
+ 261  0036            2                     MOV     A, 074H
+ 261  0036            2                     XOR     A,_FUNCTION_ID
+ 261  0036            2                     SZ [05H]
+ 261  0036            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 261  0036            2                     endif
+ 261  0036            2                 endif     
+ 261  0036            2                     ifdef   PBP
+ 261  0036            2                     MOV     A,BANK MAIN_LOOP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                     endif  
+ 261  0036            2         endif
+ 261  0036            1                 EXECUTE EXTEND_FUNCTION_1F_HALT_WAKEUP,075H,DEF_HALT_WAKEUP
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 36
+
+ 261  0036            2         ifdef EXTEND_FUNCTION_1F_HALT_WAKEUP
+ 261  0036            2                 ifndef DEF_HALT_WAKEUP
+ 261  0036            2                     #define DEF_HALT_WAKEUP
+ 261  0036            2                 endif
+ 261  0036            2                 
+ 261  0036            2                 ifdef   PBP
+ 261  0036            2                     MOV     A,BANK EXTEND_FUNCTION_1F_HALT_WAKEUP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                 endif
+ 261  0036            2                     ;-FUCNTION ID CHECK 
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 075H != 0
+ 261  0036            2                     MOV     A, 075H
+ 261  0036            2                     MOV     _FUNCTION_ID,A
+ 261  0036            2                     endif     
+ 261  0036            2                 endif
+ 261  0036            2                     ;--------------- 
+ 261  0036            2                     CALL EXTEND_FUNCTION_1F_HALT_WAKEUP
+ 261  0036            2                     ;---------------
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 075H != 0
+ 261  0036            2                     MOV     A, 075H
+ 261  0036            2                     XOR     A,_FUNCTION_ID
+ 261  0036            2                     SZ [05H]
+ 261  0036            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 261  0036            2                     endif
+ 261  0036            2                 endif     
+ 261  0036            2                     ifdef   PBP
+ 261  0036            2                     MOV     A,BANK MAIN_LOOP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                     endif  
+ 261  0036            2         endif
+ 261  0036            1                 EXECUTE EXTEND_FUNCTION_1G_HALT_WAKEUP,076H,DEF_HALT_WAKEUP
+ 261  0036            2         ifdef EXTEND_FUNCTION_1G_HALT_WAKEUP
+ 261  0036            2                 ifndef DEF_HALT_WAKEUP
+ 261  0036            2                     #define DEF_HALT_WAKEUP
+ 261  0036            2                 endif
+ 261  0036            2                 
+ 261  0036            2                 ifdef   PBP
+ 261  0036            2                     MOV     A,BANK EXTEND_FUNCTION_1G_HALT_WAKEUP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                 endif
+ 261  0036            2                     ;-FUCNTION ID CHECK 
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 076H != 0
+ 261  0036            2                     MOV     A, 076H
+ 261  0036            2                     MOV     _FUNCTION_ID,A
+ 261  0036            2                     endif     
+ 261  0036            2                 endif
+ 261  0036            2                     ;--------------- 
+ 261  0036            2                     CALL EXTEND_FUNCTION_1G_HALT_WAKEUP
+ 261  0036            2                     ;---------------
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 076H != 0
+ 261  0036            2                     MOV     A, 076H
+ 261  0036            2                     XOR     A,_FUNCTION_ID
+ 261  0036            2                     SZ [05H]
+ 261  0036            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 261  0036            2                     endif
+ 261  0036            2                 endif     
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 37
+
+ 261  0036            2                     ifdef   PBP
+ 261  0036            2                     MOV     A,BANK MAIN_LOOP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                     endif  
+ 261  0036            2         endif
+ 261  0036            1                 EXECUTE EXTEND_FUNCTION_1H_HALT_WAKEUP,077H,DEF_HALT_WAKEUP
+ 261  0036            2         ifdef EXTEND_FUNCTION_1H_HALT_WAKEUP
+ 261  0036            2                 ifndef DEF_HALT_WAKEUP
+ 261  0036            2                     #define DEF_HALT_WAKEUP
+ 261  0036            2                 endif
+ 261  0036            2                 
+ 261  0036            2                 ifdef   PBP
+ 261  0036            2                     MOV     A,BANK EXTEND_FUNCTION_1H_HALT_WAKEUP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                 endif
+ 261  0036            2                     ;-FUCNTION ID CHECK 
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 077H != 0
+ 261  0036            2                     MOV     A, 077H
+ 261  0036            2                     MOV     _FUNCTION_ID,A
+ 261  0036            2                     endif     
+ 261  0036            2                 endif
+ 261  0036            2                     ;--------------- 
+ 261  0036            2                     CALL EXTEND_FUNCTION_1H_HALT_WAKEUP
+ 261  0036            2                     ;---------------
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 077H != 0
+ 261  0036            2                     MOV     A, 077H
+ 261  0036            2                     XOR     A,_FUNCTION_ID
+ 261  0036            2                     SZ [05H]
+ 261  0036            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 261  0036            2                     endif
+ 261  0036            2                 endif     
+ 261  0036            2                     ifdef   PBP
+ 261  0036            2                     MOV     A,BANK MAIN_LOOP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                     endif  
+ 261  0036            2         endif
+ 261  0036            1                 EXECUTE EXTEND_FUNCTION_2A_HALT_WAKEUP,078H,DEF_HALT_WAKEUP
+ 261  0036            2         ifdef EXTEND_FUNCTION_2A_HALT_WAKEUP
+ 261  0036            2                 ifndef DEF_HALT_WAKEUP
+ 261  0036            2                     #define DEF_HALT_WAKEUP
+ 261  0036            2                 endif
+ 261  0036            2                 
+ 261  0036            2                 ifdef   PBP
+ 261  0036            2                     MOV     A,BANK EXTEND_FUNCTION_2A_HALT_WAKEUP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                 endif
+ 261  0036            2                     ;-FUCNTION ID CHECK 
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 078H != 0
+ 261  0036            2                     MOV     A, 078H
+ 261  0036            2                     MOV     _FUNCTION_ID,A
+ 261  0036            2                     endif     
+ 261  0036            2                 endif
+ 261  0036            2                     ;--------------- 
+ 261  0036            2                     CALL EXTEND_FUNCTION_2A_HALT_WAKEUP
+ 261  0036            2                     ;---------------
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 078H != 0
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 38
+
+ 261  0036            2                     MOV     A, 078H
+ 261  0036            2                     XOR     A,_FUNCTION_ID
+ 261  0036            2                     SZ [05H]
+ 261  0036            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 261  0036            2                     endif
+ 261  0036            2                 endif     
+ 261  0036            2                     ifdef   PBP
+ 261  0036            2                     MOV     A,BANK MAIN_LOOP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                     endif  
+ 261  0036            2         endif
+ 261  0036            1                 EXECUTE EXTEND_FUNCTION_2B_HALT_WAKEUP,079H,DEF_HALT_WAKEUP
+ 261  0036            2         ifdef EXTEND_FUNCTION_2B_HALT_WAKEUP
+ 261  0036            2                 ifndef DEF_HALT_WAKEUP
+ 261  0036            2                     #define DEF_HALT_WAKEUP
+ 261  0036            2                 endif
+ 261  0036            2                 
+ 261  0036            2                 ifdef   PBP
+ 261  0036            2                     MOV     A,BANK EXTEND_FUNCTION_2B_HALT_WAKEUP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                 endif
+ 261  0036            2                     ;-FUCNTION ID CHECK 
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 079H != 0
+ 261  0036            2                     MOV     A, 079H
+ 261  0036            2                     MOV     _FUNCTION_ID,A
+ 261  0036            2                     endif     
+ 261  0036            2                 endif
+ 261  0036            2                     ;--------------- 
+ 261  0036            2                     CALL EXTEND_FUNCTION_2B_HALT_WAKEUP
+ 261  0036            2                     ;---------------
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 079H != 0
+ 261  0036            2                     MOV     A, 079H
+ 261  0036            2                     XOR     A,_FUNCTION_ID
+ 261  0036            2                     SZ [05H]
+ 261  0036            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 261  0036            2                     endif
+ 261  0036            2                 endif     
+ 261  0036            2                     ifdef   PBP
+ 261  0036            2                     MOV     A,BANK MAIN_LOOP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                     endif  
+ 261  0036            2         endif
+ 261  0036            1                 EXECUTE EXTEND_FUNCTION_2C_HALT_WAKEUP,07AH,DEF_HALT_WAKEUP
+ 261  0036            2         ifdef EXTEND_FUNCTION_2C_HALT_WAKEUP
+ 261  0036            2                 ifndef DEF_HALT_WAKEUP
+ 261  0036            2                     #define DEF_HALT_WAKEUP
+ 261  0036            2                 endif
+ 261  0036            2                 
+ 261  0036            2                 ifdef   PBP
+ 261  0036            2                     MOV     A,BANK EXTEND_FUNCTION_2C_HALT_WAKEUP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                 endif
+ 261  0036            2                     ;-FUCNTION ID CHECK 
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 07AH != 0
+ 261  0036            2                     MOV     A, 07AH
+ 261  0036            2                     MOV     _FUNCTION_ID,A
+ 261  0036            2                     endif     
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 39
+
+ 261  0036            2                 endif
+ 261  0036            2                     ;--------------- 
+ 261  0036            2                     CALL EXTEND_FUNCTION_2C_HALT_WAKEUP
+ 261  0036            2                     ;---------------
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 07AH != 0
+ 261  0036            2                     MOV     A, 07AH
+ 261  0036            2                     XOR     A,_FUNCTION_ID
+ 261  0036            2                     SZ [05H]
+ 261  0036            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 261  0036            2                     endif
+ 261  0036            2                 endif     
+ 261  0036            2                     ifdef   PBP
+ 261  0036            2                     MOV     A,BANK MAIN_LOOP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                     endif  
+ 261  0036            2         endif
+ 261  0036            1                 EXECUTE EXTEND_FUNCTION_2D_HALT_WAKEUP,07BH,DEF_HALT_WAKEUP
+ 261  0036            2         ifdef EXTEND_FUNCTION_2D_HALT_WAKEUP
+ 261  0036            2                 ifndef DEF_HALT_WAKEUP
+ 261  0036            2                     #define DEF_HALT_WAKEUP
+ 261  0036            2                 endif
+ 261  0036            2                 
+ 261  0036            2                 ifdef   PBP
+ 261  0036            2                     MOV     A,BANK EXTEND_FUNCTION_2D_HALT_WAKEUP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                 endif
+ 261  0036            2                     ;-FUCNTION ID CHECK 
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 07BH != 0
+ 261  0036            2                     MOV     A, 07BH
+ 261  0036            2                     MOV     _FUNCTION_ID,A
+ 261  0036            2                     endif     
+ 261  0036            2                 endif
+ 261  0036            2                     ;--------------- 
+ 261  0036            2                     CALL EXTEND_FUNCTION_2D_HALT_WAKEUP
+ 261  0036            2                     ;---------------
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 07BH != 0
+ 261  0036            2                     MOV     A, 07BH
+ 261  0036            2                     XOR     A,_FUNCTION_ID
+ 261  0036            2                     SZ [05H]
+ 261  0036            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 261  0036            2                     endif
+ 261  0036            2                 endif     
+ 261  0036            2                     ifdef   PBP
+ 261  0036            2                     MOV     A,BANK MAIN_LOOP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                     endif  
+ 261  0036            2         endif
+ 261  0036            1                 EXECUTE EXTEND_FUNCTION_2E_HALT_WAKEUP,07CH,DEF_HALT_WAKEUP
+ 261  0036            2         ifdef EXTEND_FUNCTION_2E_HALT_WAKEUP
+ 261  0036            2                 ifndef DEF_HALT_WAKEUP
+ 261  0036            2                     #define DEF_HALT_WAKEUP
+ 261  0036            2                 endif
+ 261  0036            2                 
+ 261  0036            2                 ifdef   PBP
+ 261  0036            2                     MOV     A,BANK EXTEND_FUNCTION_2E_HALT_WAKEUP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                 endif
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 40
+
+ 261  0036            2                     ;-FUCNTION ID CHECK 
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 07CH != 0
+ 261  0036            2                     MOV     A, 07CH
+ 261  0036            2                     MOV     _FUNCTION_ID,A
+ 261  0036            2                     endif     
+ 261  0036            2                 endif
+ 261  0036            2                     ;--------------- 
+ 261  0036            2                     CALL EXTEND_FUNCTION_2E_HALT_WAKEUP
+ 261  0036            2                     ;---------------
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 07CH != 0
+ 261  0036            2                     MOV     A, 07CH
+ 261  0036            2                     XOR     A,_FUNCTION_ID
+ 261  0036            2                     SZ [05H]
+ 261  0036            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 261  0036            2                     endif
+ 261  0036            2                 endif     
+ 261  0036            2                     ifdef   PBP
+ 261  0036            2                     MOV     A,BANK MAIN_LOOP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                     endif  
+ 261  0036            2         endif
+ 261  0036            1                 EXECUTE EXTEND_FUNCTION_2F_HALT_WAKEUP,07DH,DEF_HALT_WAKEUP
+ 261  0036            2         ifdef EXTEND_FUNCTION_2F_HALT_WAKEUP
+ 261  0036            2                 ifndef DEF_HALT_WAKEUP
+ 261  0036            2                     #define DEF_HALT_WAKEUP
+ 261  0036            2                 endif
+ 261  0036            2                 
+ 261  0036            2                 ifdef   PBP
+ 261  0036            2                     MOV     A,BANK EXTEND_FUNCTION_2F_HALT_WAKEUP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                 endif
+ 261  0036            2                     ;-FUCNTION ID CHECK 
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 07DH != 0
+ 261  0036            2                     MOV     A, 07DH
+ 261  0036            2                     MOV     _FUNCTION_ID,A
+ 261  0036            2                     endif     
+ 261  0036            2                 endif
+ 261  0036            2                     ;--------------- 
+ 261  0036            2                     CALL EXTEND_FUNCTION_2F_HALT_WAKEUP
+ 261  0036            2                     ;---------------
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 07DH != 0
+ 261  0036            2                     MOV     A, 07DH
+ 261  0036            2                     XOR     A,_FUNCTION_ID
+ 261  0036            2                     SZ [05H]
+ 261  0036            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 261  0036            2                     endif
+ 261  0036            2                 endif     
+ 261  0036            2                     ifdef   PBP
+ 261  0036            2                     MOV     A,BANK MAIN_LOOP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                     endif  
+ 261  0036            2         endif
+ 261  0036            1                 EXECUTE EXTEND_FUNCTION_2G_HALT_WAKEUP,07EH,DEF_HALT_WAKEUP
+ 261  0036            2         ifdef EXTEND_FUNCTION_2G_HALT_WAKEUP
+ 261  0036            2                 ifndef DEF_HALT_WAKEUP
+ 261  0036            2                     #define DEF_HALT_WAKEUP
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 41
+
+ 261  0036            2                 endif
+ 261  0036            2                 
+ 261  0036            2                 ifdef   PBP
+ 261  0036            2                     MOV     A,BANK EXTEND_FUNCTION_2G_HALT_WAKEUP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                 endif
+ 261  0036            2                     ;-FUCNTION ID CHECK 
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 07EH != 0
+ 261  0036            2                     MOV     A, 07EH
+ 261  0036            2                     MOV     _FUNCTION_ID,A
+ 261  0036            2                     endif     
+ 261  0036            2                 endif
+ 261  0036            2                     ;--------------- 
+ 261  0036            2                     CALL EXTEND_FUNCTION_2G_HALT_WAKEUP
+ 261  0036            2                     ;---------------
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 07EH != 0
+ 261  0036            2                     MOV     A, 07EH
+ 261  0036            2                     XOR     A,_FUNCTION_ID
+ 261  0036            2                     SZ [05H]
+ 261  0036            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 261  0036            2                     endif
+ 261  0036            2                 endif     
+ 261  0036            2                     ifdef   PBP
+ 261  0036            2                     MOV     A,BANK MAIN_LOOP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                     endif  
+ 261  0036            2         endif
+ 261  0036            1                 EXECUTE EXTEND_FUNCTION_2H_HALT_WAKEUP,07FH,DEF_HALT_WAKEUP
+ 261  0036            2         ifdef EXTEND_FUNCTION_2H_HALT_WAKEUP
+ 261  0036            2                 ifndef DEF_HALT_WAKEUP
+ 261  0036            2                     #define DEF_HALT_WAKEUP
+ 261  0036            2                 endif
+ 261  0036            2                 
+ 261  0036            2                 ifdef   PBP
+ 261  0036            2                     MOV     A,BANK EXTEND_FUNCTION_2H_HALT_WAKEUP
+ 261  0036            2                     MOV     PBP,A
+ 261  0036            2                 endif
+ 261  0036            2                     ;-FUCNTION ID CHECK 
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 07FH != 0
+ 261  0036            2                     MOV     A, 07FH
+ 261  0036            2                     MOV     _FUNCTION_ID,A
+ 261  0036            2                     endif     
+ 261  0036            2                 endif
+ 261  0036            2                     ;--------------- 
+ 261  0036            2                     CALL EXTEND_FUNCTION_2H_HALT_WAKEUP
+ 261  0036            2                     ;---------------
+ 261  0036            2                 ifndef      ESCfunctionIDcheck
+ 261  0036            2                     if 07FH != 0
+ 261  0036            2                     MOV     A, 07FH
+ 261  0036            2                     XOR     A,_FUNCTION_ID
+ 261  0036            2                     SZ [05H]
+ 261  0036            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 261  0036            2                     endif
+ 261  0036            2                 endif     
+ 261  0036            2                     ifdef   PBP
+ 261  0036            2                     MOV     A,BANK MAIN_LOOP
+ 261  0036            2                     MOV     PBP,A
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 42
+
+ 261  0036            2                     endif  
+ 261  0036            2         endif
+ 262  0036                              
+ 263  0036                      ifdef   PBP
+ 264  0036                              MOV     BANK ENTER_HALT
+ 265  0036                              MOV     PBP,A
+ 266  0036                      endif
+ 267  0036                      
+ 268  0036                      
+ 269  0036                      ifdef DEF_HALT_WAKEUP
+ 270  0036  3800     R                  SNZ     _HALT_STATE.7       ;CHECK ALL PROGRAM CONTORL _HALT_STATE
+ 271  0037  1080     R                  SZ      _HALT_STATE
+ 272  0038  2800     R                  JMP     ENTER_HALT 
+ 273  0039                      endif
+ 274  0039                              
+ 275  0039                              ;--------------------
+ 276  0039              PROGRAM_WAKEUP: ;-WAKEUP FUNCTION     
+ 277  0039                              ;--------------------
+ 278  0039                              
+ 279  0039                      ifdef   PBP
+ 280  0039                              MOV     BANK MAIN_LOOP
+ 281  0039                              MOV     PBP,A
+ 282  0039                      endif
+ 283  0039                      
+ 284  0039                              EXTEND_FUNCTION_RETURN_MAIN
+ 284  0039            1                 EXECUTE EXTEND_FUNCTION_1A_RETURN_MAIN,080H,DEF_RETURN_MAIN
+ 284  0039            2         ifdef EXTEND_FUNCTION_1A_RETURN_MAIN
+ 284  0039            2                 ifndef DEF_RETURN_MAIN
+ 284  0039            2                     #define DEF_RETURN_MAIN
+ 284  0039            2                 endif
+ 284  0039            2                 
+ 284  0039            2                 ifdef   PBP
+ 284  0039            2                     MOV     A,BANK _BS84B08C_CTOUCH_RETURN_MAIN
+ 284  0039            2                     MOV     PBP,A
+ 284  0039            2                 endif
+ 284  0039            2                     ;-FUCNTION ID CHECK 
+ 284  0039            2                 ifndef      ESCfunctionIDcheck
+ 284  0039            2                     if 080H != 0
+ 284  0039            2                     MOV     A, 080H
+ 284  0039            2                     MOV     _FUNCTION_ID,A
+ 284  0039            2                     endif     
+ 284  0039            2                 endif
+ 284  0039            2                     ;--------------- 
+ 284  0039  2000     R2                     CALL _BS84B08C_CTOUCH_RETURN_MAIN
+ 284  003A            2                     ;---------------
+ 284  003A            2                 ifndef      ESCfunctionIDcheck
+ 284  003A            2                     if 080H != 0
+ 284  003A            2                     MOV     A, 080H
+ 284  003A            2                     XOR     A,_FUNCTION_ID
+ 284  003A            2                     SZ [05H]
+ 284  003A            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 284  003A            2                     endif
+ 284  003A            2                 endif     
+ 284  003A            2                     ifdef   PBP
+ 284  003A            2                     MOV     A,BANK MAIN_LOOP
+ 284  003A            2                     MOV     PBP,A
+ 284  003A            2                     endif  
+ 284  003A            2         endif
+ 284  003A            1                 EXECUTE EXTEND_FUNCTION_1B_RETURN_MAIN,081H,DEF_RETURN_MAIN
+ 284  003A            2         ifdef EXTEND_FUNCTION_1B_RETURN_MAIN
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 43
+
+ 284  003A            2                 ifndef DEF_RETURN_MAIN
+ 284  003A            2                     #define DEF_RETURN_MAIN
+ 284  003A            2                 endif
+ 284  003A            2                 
+ 284  003A            2                 ifdef   PBP
+ 284  003A            2                     MOV     A,BANK EXTEND_FUNCTION_1B_RETURN_MAIN
+ 284  003A            2                     MOV     PBP,A
+ 284  003A            2                 endif
+ 284  003A            2                     ;-FUCNTION ID CHECK 
+ 284  003A            2                 ifndef      ESCfunctionIDcheck
+ 284  003A            2                     if 081H != 0
+ 284  003A            2                     MOV     A, 081H
+ 284  003A            2                     MOV     _FUNCTION_ID,A
+ 284  003A            2                     endif     
+ 284  003A            2                 endif
+ 284  003A            2                     ;--------------- 
+ 284  003A            2                     CALL EXTEND_FUNCTION_1B_RETURN_MAIN
+ 284  003A            2                     ;---------------
+ 284  003A            2                 ifndef      ESCfunctionIDcheck
+ 284  003A            2                     if 081H != 0
+ 284  003A            2                     MOV     A, 081H
+ 284  003A            2                     XOR     A,_FUNCTION_ID
+ 284  003A            2                     SZ [05H]
+ 284  003A            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 284  003A            2                     endif
+ 284  003A            2                 endif     
+ 284  003A            2                     ifdef   PBP
+ 284  003A            2                     MOV     A,BANK MAIN_LOOP
+ 284  003A            2                     MOV     PBP,A
+ 284  003A            2                     endif  
+ 284  003A            2         endif
+ 284  003A            1                 EXECUTE EXTEND_FUNCTION_1C_RETURN_MAIN,082H,DEF_RETURN_MAIN
+ 284  003A            2         ifdef EXTEND_FUNCTION_1C_RETURN_MAIN
+ 284  003A            2                 ifndef DEF_RETURN_MAIN
+ 284  003A            2                     #define DEF_RETURN_MAIN
+ 284  003A            2                 endif
+ 284  003A            2                 
+ 284  003A            2                 ifdef   PBP
+ 284  003A            2                     MOV     A,BANK EXTEND_FUNCTION_1C_RETURN_MAIN
+ 284  003A            2                     MOV     PBP,A
+ 284  003A            2                 endif
+ 284  003A            2                     ;-FUCNTION ID CHECK 
+ 284  003A            2                 ifndef      ESCfunctionIDcheck
+ 284  003A            2                     if 082H != 0
+ 284  003A            2                     MOV     A, 082H
+ 284  003A            2                     MOV     _FUNCTION_ID,A
+ 284  003A            2                     endif     
+ 284  003A            2                 endif
+ 284  003A            2                     ;--------------- 
+ 284  003A            2                     CALL EXTEND_FUNCTION_1C_RETURN_MAIN
+ 284  003A            2                     ;---------------
+ 284  003A            2                 ifndef      ESCfunctionIDcheck
+ 284  003A            2                     if 082H != 0
+ 284  003A            2                     MOV     A, 082H
+ 284  003A            2                     XOR     A,_FUNCTION_ID
+ 284  003A            2                     SZ [05H]
+ 284  003A            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 284  003A            2                     endif
+ 284  003A            2                 endif     
+ 284  003A            2                     ifdef   PBP
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 44
+
+ 284  003A            2                     MOV     A,BANK MAIN_LOOP
+ 284  003A            2                     MOV     PBP,A
+ 284  003A            2                     endif  
+ 284  003A            2         endif
+ 284  003A            1                 EXECUTE EXTEND_FUNCTION_1D_RETURN_MAIN,083H,DEF_RETURN_MAIN
+ 284  003A            2         ifdef EXTEND_FUNCTION_1D_RETURN_MAIN
+ 284  003A            2                 ifndef DEF_RETURN_MAIN
+ 284  003A            2                     #define DEF_RETURN_MAIN
+ 284  003A            2                 endif
+ 284  003A            2                 
+ 284  003A            2                 ifdef   PBP
+ 284  003A            2                     MOV     A,BANK _USER_PROGRAM_RETURN_MAIN
+ 284  003A            2                     MOV     PBP,A
+ 284  003A            2                 endif
+ 284  003A            2                     ;-FUCNTION ID CHECK 
+ 284  003A            2                 ifndef      ESCfunctionIDcheck
+ 284  003A            2                     if 083H != 0
+ 284  003A            2                     MOV     A, 083H
+ 284  003A            2                     MOV     _FUNCTION_ID,A
+ 284  003A            2                     endif     
+ 284  003A            2                 endif
+ 284  003A            2                     ;--------------- 
+ 284  003A  2000     E2                     CALL _USER_PROGRAM_RETURN_MAIN
+ 284  003B            2                     ;---------------
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 083H != 0
+ 284  003B            2                     MOV     A, 083H
+ 284  003B            2                     XOR     A,_FUNCTION_ID
+ 284  003B            2                     SZ [05H]
+ 284  003B            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 284  003B            2                     endif
+ 284  003B            2                 endif     
+ 284  003B            2                     ifdef   PBP
+ 284  003B            2                     MOV     A,BANK MAIN_LOOP
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                     endif  
+ 284  003B            2         endif
+ 284  003B            1                 EXECUTE EXTEND_FUNCTION_1E_RETURN_MAIN,084H,DEF_RETURN_MAIN
+ 284  003B            2         ifdef EXTEND_FUNCTION_1E_RETURN_MAIN
+ 284  003B            2                 ifndef DEF_RETURN_MAIN
+ 284  003B            2                     #define DEF_RETURN_MAIN
+ 284  003B            2                 endif
+ 284  003B            2                 
+ 284  003B            2                 ifdef   PBP
+ 284  003B            2                     MOV     A,BANK EXTEND_FUNCTION_1E_RETURN_MAIN
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                 endif
+ 284  003B            2                     ;-FUCNTION ID CHECK 
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 084H != 0
+ 284  003B            2                     MOV     A, 084H
+ 284  003B            2                     MOV     _FUNCTION_ID,A
+ 284  003B            2                     endif     
+ 284  003B            2                 endif
+ 284  003B            2                     ;--------------- 
+ 284  003B            2                     CALL EXTEND_FUNCTION_1E_RETURN_MAIN
+ 284  003B            2                     ;---------------
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 084H != 0
+ 284  003B            2                     MOV     A, 084H
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 45
+
+ 284  003B            2                     XOR     A,_FUNCTION_ID
+ 284  003B            2                     SZ [05H]
+ 284  003B            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 284  003B            2                     endif
+ 284  003B            2                 endif     
+ 284  003B            2                     ifdef   PBP
+ 284  003B            2                     MOV     A,BANK MAIN_LOOP
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                     endif  
+ 284  003B            2         endif
+ 284  003B            1                 EXECUTE EXTEND_FUNCTION_1F_RETURN_MAIN,085H,DEF_RETURN_MAIN
+ 284  003B            2         ifdef EXTEND_FUNCTION_1F_RETURN_MAIN
+ 284  003B            2                 ifndef DEF_RETURN_MAIN
+ 284  003B            2                     #define DEF_RETURN_MAIN
+ 284  003B            2                 endif
+ 284  003B            2                 
+ 284  003B            2                 ifdef   PBP
+ 284  003B            2                     MOV     A,BANK EXTEND_FUNCTION_1F_RETURN_MAIN
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                 endif
+ 284  003B            2                     ;-FUCNTION ID CHECK 
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 085H != 0
+ 284  003B            2                     MOV     A, 085H
+ 284  003B            2                     MOV     _FUNCTION_ID,A
+ 284  003B            2                     endif     
+ 284  003B            2                 endif
+ 284  003B            2                     ;--------------- 
+ 284  003B            2                     CALL EXTEND_FUNCTION_1F_RETURN_MAIN
+ 284  003B            2                     ;---------------
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 085H != 0
+ 284  003B            2                     MOV     A, 085H
+ 284  003B            2                     XOR     A,_FUNCTION_ID
+ 284  003B            2                     SZ [05H]
+ 284  003B            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 284  003B            2                     endif
+ 284  003B            2                 endif     
+ 284  003B            2                     ifdef   PBP
+ 284  003B            2                     MOV     A,BANK MAIN_LOOP
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                     endif  
+ 284  003B            2         endif
+ 284  003B            1                 EXECUTE EXTEND_FUNCTION_1G_RETURN_MAIN,086H,DEF_RETURN_MAIN
+ 284  003B            2         ifdef EXTEND_FUNCTION_1G_RETURN_MAIN
+ 284  003B            2                 ifndef DEF_RETURN_MAIN
+ 284  003B            2                     #define DEF_RETURN_MAIN
+ 284  003B            2                 endif
+ 284  003B            2                 
+ 284  003B            2                 ifdef   PBP
+ 284  003B            2                     MOV     A,BANK EXTEND_FUNCTION_1G_RETURN_MAIN
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                 endif
+ 284  003B            2                     ;-FUCNTION ID CHECK 
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 086H != 0
+ 284  003B            2                     MOV     A, 086H
+ 284  003B            2                     MOV     _FUNCTION_ID,A
+ 284  003B            2                     endif     
+ 284  003B            2                 endif
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 46
+
+ 284  003B            2                     ;--------------- 
+ 284  003B            2                     CALL EXTEND_FUNCTION_1G_RETURN_MAIN
+ 284  003B            2                     ;---------------
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 086H != 0
+ 284  003B            2                     MOV     A, 086H
+ 284  003B            2                     XOR     A,_FUNCTION_ID
+ 284  003B            2                     SZ [05H]
+ 284  003B            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 284  003B            2                     endif
+ 284  003B            2                 endif     
+ 284  003B            2                     ifdef   PBP
+ 284  003B            2                     MOV     A,BANK MAIN_LOOP
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                     endif  
+ 284  003B            2         endif
+ 284  003B            1                 EXECUTE EXTEND_FUNCTION_1H_RETURN_MAIN,087H,DEF_RETURN_MAIN
+ 284  003B            2         ifdef EXTEND_FUNCTION_1H_RETURN_MAIN
+ 284  003B            2                 ifndef DEF_RETURN_MAIN
+ 284  003B            2                     #define DEF_RETURN_MAIN
+ 284  003B            2                 endif
+ 284  003B            2                 
+ 284  003B            2                 ifdef   PBP
+ 284  003B            2                     MOV     A,BANK EXTEND_FUNCTION_1H_RETURN_MAIN
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                 endif
+ 284  003B            2                     ;-FUCNTION ID CHECK 
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 087H != 0
+ 284  003B            2                     MOV     A, 087H
+ 284  003B            2                     MOV     _FUNCTION_ID,A
+ 284  003B            2                     endif     
+ 284  003B            2                 endif
+ 284  003B            2                     ;--------------- 
+ 284  003B            2                     CALL EXTEND_FUNCTION_1H_RETURN_MAIN
+ 284  003B            2                     ;---------------
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 087H != 0
+ 284  003B            2                     MOV     A, 087H
+ 284  003B            2                     XOR     A,_FUNCTION_ID
+ 284  003B            2                     SZ [05H]
+ 284  003B            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 284  003B            2                     endif
+ 284  003B            2                 endif     
+ 284  003B            2                     ifdef   PBP
+ 284  003B            2                     MOV     A,BANK MAIN_LOOP
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                     endif  
+ 284  003B            2         endif
+ 284  003B            1                 EXECUTE EXTEND_FUNCTION_2A_RETURN_MAIN,088H,DEF_RETURN_MAIN
+ 284  003B            2         ifdef EXTEND_FUNCTION_2A_RETURN_MAIN
+ 284  003B            2                 ifndef DEF_RETURN_MAIN
+ 284  003B            2                     #define DEF_RETURN_MAIN
+ 284  003B            2                 endif
+ 284  003B            2                 
+ 284  003B            2                 ifdef   PBP
+ 284  003B            2                     MOV     A,BANK EXTEND_FUNCTION_2A_RETURN_MAIN
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                 endif
+ 284  003B            2                     ;-FUCNTION ID CHECK 
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 47
+
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 088H != 0
+ 284  003B            2                     MOV     A, 088H
+ 284  003B            2                     MOV     _FUNCTION_ID,A
+ 284  003B            2                     endif     
+ 284  003B            2                 endif
+ 284  003B            2                     ;--------------- 
+ 284  003B            2                     CALL EXTEND_FUNCTION_2A_RETURN_MAIN
+ 284  003B            2                     ;---------------
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 088H != 0
+ 284  003B            2                     MOV     A, 088H
+ 284  003B            2                     XOR     A,_FUNCTION_ID
+ 284  003B            2                     SZ [05H]
+ 284  003B            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 284  003B            2                     endif
+ 284  003B            2                 endif     
+ 284  003B            2                     ifdef   PBP
+ 284  003B            2                     MOV     A,BANK MAIN_LOOP
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                     endif  
+ 284  003B            2         endif
+ 284  003B            1                 EXECUTE EXTEND_FUNCTION_2B_RETURN_MAIN,089H,DEF_RETURN_MAIN
+ 284  003B            2         ifdef EXTEND_FUNCTION_2B_RETURN_MAIN
+ 284  003B            2                 ifndef DEF_RETURN_MAIN
+ 284  003B            2                     #define DEF_RETURN_MAIN
+ 284  003B            2                 endif
+ 284  003B            2                 
+ 284  003B            2                 ifdef   PBP
+ 284  003B            2                     MOV     A,BANK EXTEND_FUNCTION_2B_RETURN_MAIN
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                 endif
+ 284  003B            2                     ;-FUCNTION ID CHECK 
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 089H != 0
+ 284  003B            2                     MOV     A, 089H
+ 284  003B            2                     MOV     _FUNCTION_ID,A
+ 284  003B            2                     endif     
+ 284  003B            2                 endif
+ 284  003B            2                     ;--------------- 
+ 284  003B            2                     CALL EXTEND_FUNCTION_2B_RETURN_MAIN
+ 284  003B            2                     ;---------------
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 089H != 0
+ 284  003B            2                     MOV     A, 089H
+ 284  003B            2                     XOR     A,_FUNCTION_ID
+ 284  003B            2                     SZ [05H]
+ 284  003B            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 284  003B            2                     endif
+ 284  003B            2                 endif     
+ 284  003B            2                     ifdef   PBP
+ 284  003B            2                     MOV     A,BANK MAIN_LOOP
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                     endif  
+ 284  003B            2         endif
+ 284  003B            1                 EXECUTE EXTEND_FUNCTION_2C_RETURN_MAIN,08AH,DEF_RETURN_MAIN
+ 284  003B            2         ifdef EXTEND_FUNCTION_2C_RETURN_MAIN
+ 284  003B            2                 ifndef DEF_RETURN_MAIN
+ 284  003B            2                     #define DEF_RETURN_MAIN
+ 284  003B            2                 endif
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 48
+
+ 284  003B            2                 
+ 284  003B            2                 ifdef   PBP
+ 284  003B            2                     MOV     A,BANK EXTEND_FUNCTION_2C_RETURN_MAIN
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                 endif
+ 284  003B            2                     ;-FUCNTION ID CHECK 
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 08AH != 0
+ 284  003B            2                     MOV     A, 08AH
+ 284  003B            2                     MOV     _FUNCTION_ID,A
+ 284  003B            2                     endif     
+ 284  003B            2                 endif
+ 284  003B            2                     ;--------------- 
+ 284  003B            2                     CALL EXTEND_FUNCTION_2C_RETURN_MAIN
+ 284  003B            2                     ;---------------
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 08AH != 0
+ 284  003B            2                     MOV     A, 08AH
+ 284  003B            2                     XOR     A,_FUNCTION_ID
+ 284  003B            2                     SZ [05H]
+ 284  003B            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 284  003B            2                     endif
+ 284  003B            2                 endif     
+ 284  003B            2                     ifdef   PBP
+ 284  003B            2                     MOV     A,BANK MAIN_LOOP
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                     endif  
+ 284  003B            2         endif
+ 284  003B            1                 EXECUTE EXTEND_FUNCTION_2D_RETURN_MAIN,08BH,DEF_RETURN_MAIN
+ 284  003B            2         ifdef EXTEND_FUNCTION_2D_RETURN_MAIN
+ 284  003B            2                 ifndef DEF_RETURN_MAIN
+ 284  003B            2                     #define DEF_RETURN_MAIN
+ 284  003B            2                 endif
+ 284  003B            2                 
+ 284  003B            2                 ifdef   PBP
+ 284  003B            2                     MOV     A,BANK EXTEND_FUNCTION_2D_RETURN_MAIN
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                 endif
+ 284  003B            2                     ;-FUCNTION ID CHECK 
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 08BH != 0
+ 284  003B            2                     MOV     A, 08BH
+ 284  003B            2                     MOV     _FUNCTION_ID,A
+ 284  003B            2                     endif     
+ 284  003B            2                 endif
+ 284  003B            2                     ;--------------- 
+ 284  003B            2                     CALL EXTEND_FUNCTION_2D_RETURN_MAIN
+ 284  003B            2                     ;---------------
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 08BH != 0
+ 284  003B            2                     MOV     A, 08BH
+ 284  003B            2                     XOR     A,_FUNCTION_ID
+ 284  003B            2                     SZ [05H]
+ 284  003B            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 284  003B            2                     endif
+ 284  003B            2                 endif     
+ 284  003B            2                     ifdef   PBP
+ 284  003B            2                     MOV     A,BANK MAIN_LOOP
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                     endif  
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 49
+
+ 284  003B            2         endif
+ 284  003B            1                 EXECUTE EXTEND_FUNCTION_2E_RETURN_MAIN,08CH,DEF_RETURN_MAIN
+ 284  003B            2         ifdef EXTEND_FUNCTION_2E_RETURN_MAIN
+ 284  003B            2                 ifndef DEF_RETURN_MAIN
+ 284  003B            2                     #define DEF_RETURN_MAIN
+ 284  003B            2                 endif
+ 284  003B            2                 
+ 284  003B            2                 ifdef   PBP
+ 284  003B            2                     MOV     A,BANK EXTEND_FUNCTION_2E_RETURN_MAIN
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                 endif
+ 284  003B            2                     ;-FUCNTION ID CHECK 
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 08CH != 0
+ 284  003B            2                     MOV     A, 08CH
+ 284  003B            2                     MOV     _FUNCTION_ID,A
+ 284  003B            2                     endif     
+ 284  003B            2                 endif
+ 284  003B            2                     ;--------------- 
+ 284  003B            2                     CALL EXTEND_FUNCTION_2E_RETURN_MAIN
+ 284  003B            2                     ;---------------
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 08CH != 0
+ 284  003B            2                     MOV     A, 08CH
+ 284  003B            2                     XOR     A,_FUNCTION_ID
+ 284  003B            2                     SZ [05H]
+ 284  003B            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 284  003B            2                     endif
+ 284  003B            2                 endif     
+ 284  003B            2                     ifdef   PBP
+ 284  003B            2                     MOV     A,BANK MAIN_LOOP
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                     endif  
+ 284  003B            2         endif
+ 284  003B            1                 EXECUTE EXTEND_FUNCTION_2F_RETURN_MAIN,08DH,DEF_RETURN_MAIN
+ 284  003B            2         ifdef EXTEND_FUNCTION_2F_RETURN_MAIN
+ 284  003B            2                 ifndef DEF_RETURN_MAIN
+ 284  003B            2                     #define DEF_RETURN_MAIN
+ 284  003B            2                 endif
+ 284  003B            2                 
+ 284  003B            2                 ifdef   PBP
+ 284  003B            2                     MOV     A,BANK EXTEND_FUNCTION_2F_RETURN_MAIN
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                 endif
+ 284  003B            2                     ;-FUCNTION ID CHECK 
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 08DH != 0
+ 284  003B            2                     MOV     A, 08DH
+ 284  003B            2                     MOV     _FUNCTION_ID,A
+ 284  003B            2                     endif     
+ 284  003B            2                 endif
+ 284  003B            2                     ;--------------- 
+ 284  003B            2                     CALL EXTEND_FUNCTION_2F_RETURN_MAIN
+ 284  003B            2                     ;---------------
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 08DH != 0
+ 284  003B            2                     MOV     A, 08DH
+ 284  003B            2                     XOR     A,_FUNCTION_ID
+ 284  003B            2                     SZ [05H]
+ 284  003B            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 50
+
+ 284  003B            2                     endif
+ 284  003B            2                 endif     
+ 284  003B            2                     ifdef   PBP
+ 284  003B            2                     MOV     A,BANK MAIN_LOOP
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                     endif  
+ 284  003B            2         endif
+ 284  003B            1                 EXECUTE EXTEND_FUNCTION_2G_RETURN_MAIN,08EH,DEF_RETURN_MAIN
+ 284  003B            2         ifdef EXTEND_FUNCTION_2G_RETURN_MAIN
+ 284  003B            2                 ifndef DEF_RETURN_MAIN
+ 284  003B            2                     #define DEF_RETURN_MAIN
+ 284  003B            2                 endif
+ 284  003B            2                 
+ 284  003B            2                 ifdef   PBP
+ 284  003B            2                     MOV     A,BANK EXTEND_FUNCTION_2G_RETURN_MAIN
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                 endif
+ 284  003B            2                     ;-FUCNTION ID CHECK 
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 08EH != 0
+ 284  003B            2                     MOV     A, 08EH
+ 284  003B            2                     MOV     _FUNCTION_ID,A
+ 284  003B            2                     endif     
+ 284  003B            2                 endif
+ 284  003B            2                     ;--------------- 
+ 284  003B            2                     CALL EXTEND_FUNCTION_2G_RETURN_MAIN
+ 284  003B            2                     ;---------------
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 08EH != 0
+ 284  003B            2                     MOV     A, 08EH
+ 284  003B            2                     XOR     A,_FUNCTION_ID
+ 284  003B            2                     SZ [05H]
+ 284  003B            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 284  003B            2                     endif
+ 284  003B            2                 endif     
+ 284  003B            2                     ifdef   PBP
+ 284  003B            2                     MOV     A,BANK MAIN_LOOP
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                     endif  
+ 284  003B            2         endif
+ 284  003B            1                 EXECUTE EXTEND_FUNCTION_2H_RETURN_MAIN,08FH,DEF_RETURN_MAIN
+ 284  003B            2         ifdef EXTEND_FUNCTION_2H_RETURN_MAIN
+ 284  003B            2                 ifndef DEF_RETURN_MAIN
+ 284  003B            2                     #define DEF_RETURN_MAIN
+ 284  003B            2                 endif
+ 284  003B            2                 
+ 284  003B            2                 ifdef   PBP
+ 284  003B            2                     MOV     A,BANK EXTEND_FUNCTION_2H_RETURN_MAIN
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                 endif
+ 284  003B            2                     ;-FUCNTION ID CHECK 
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 08FH != 0
+ 284  003B            2                     MOV     A, 08FH
+ 284  003B            2                     MOV     _FUNCTION_ID,A
+ 284  003B            2                     endif     
+ 284  003B            2                 endif
+ 284  003B            2                     ;--------------- 
+ 284  003B            2                     CALL EXTEND_FUNCTION_2H_RETURN_MAIN
+ 284  003B            2                     ;---------------
+"File: MAIN_PROGRAM_V300.asm  Assembler  Version 2.98      Page 51
+
+ 284  003B            2                 ifndef      ESCfunctionIDcheck
+ 284  003B            2                     if 08FH != 0
+ 284  003B            2                     MOV     A, 08FH
+ 284  003B            2                     XOR     A,_FUNCTION_ID
+ 284  003B            2                     SZ [05H]
+ 284  003B            2                     JMP     PROGRAM_RESET           ;PCL Abnormal
+ 284  003B            2                     endif
+ 284  003B            2                 endif     
+ 284  003B            2                     ifdef   PBP
+ 284  003B            2                     MOV     A,BANK MAIN_LOOP
+ 284  003B            2                     MOV     PBP,A
+ 284  003B            2                     endif  
+ 284  003B            2         endif
+ 285  003B  2800     R                  JMP     MAIN_LOOP
+ 286  003C              
+ 287  003C              
+ 288  003C              
+
+
+        0 Errors, 0 Warnings

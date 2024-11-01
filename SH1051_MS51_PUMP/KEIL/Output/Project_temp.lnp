@@ -1,0 +1,12 @@
+".\Output\main.obj",
+".\Output\isr.obj",
+".\Output\STARTUP.obj",
+".\Output\driver_app.obj",
+".\Output\driver_debug.obj",
+".\Output\library_app.obj",
+".\Output\library_debug.obj",
+".\Output\library_i2c.obj" 
+TO ".\Output\Project_temp" 
+
+PRINT(".\lst\Project_temp.map") DISABLEWARNING (16) 
+REMOVEUNUSED 

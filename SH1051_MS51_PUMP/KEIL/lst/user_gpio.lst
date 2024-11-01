@@ -1,0 +1,184 @@
+C51 COMPILER V9.60.7.0   USER_GPIO                                                         01/30/2024 09:23:35 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE USER_GPIO
+OBJECT MODULE PLACED IN .\Output\user_gpio.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE ..\user_library\src\user_gpio.c LARGE OMF2 OPTIMIZE(7,SPEED) BROWSE INCD
+                    -IR(..\Library\Device\Include;..\Library\StdDriver\inc;..\user_library\inc) DEBUG PRINT(.\lst\user_gpio.lst) TABS(2) OBJE
+                    -CT(.\Output\user_gpio.obj)
+
+line level    source
+
+   1          #include "user_gpio.h"
+   2          #include "ms51_16k.h"
+   3          
+   4          #define TRIAC_PIN           P17
+   5          #define TRIAC_MCR           7
+   6          #define TRIAC_PORT          P1
+   7          
+   8          #define OUTAC_PIN           P03
+   9          #define OUTAC_MCR           3
+  10          #define OUTAC_PORT          P0
+  11          
+  12          #define VS_PIN              P11
+  13          #define VS_MCR              1
+  14          #define VS_PORT             P1
+  15          
+  16          #define LO_PIN              P12
+  17          #define LO_MCR              2
+  18          #define LO_PORT             P1
+  19          
+  20          #define OS_PIN              P04
+  21          #define OS_MCR              4
+  22          #define OS_PORT             P0
+  23          
+  24          #define OS_PIN              P04
+  25          #define OS_MCR              4
+  26          #define OS_PORT             P0
+  27          
+  28          #define PUMP_PIN            P05
+  29          #define PUMP_MCR            5
+  30          #define PUMP_PORT           P0
+  31          
+  32          void user_gpio_output_triac_init(void)
+  33          {
+  34   1        P1M1 &= ~(1 << TRIAC_MCR);
+  35   1        P1M2 |= (1 << TRIAC_MCR);  
+  36   1      }
+  37          void user_gpio_output_triac_high(void)
+  38          {
+  39   1        TRIAC_PIN = 1;
+  40   1      }
+  41          void user_gpio_output_triac_low(void)
+  42          {
+  43   1        TRIAC_PIN = 0;
+  44   1      }
+  45          void user_gpio_output_triac_tonggle(void)
+  46          {
+  47   1        TRIAC_PIN = !TRIAC_PIN;
+  48   1      }
+  49          
+  50          void user_gpio_output_outac_init(void)
+  51          {
+  52   1        P0M1 &= ~(1 << OUTAC_MCR);
+  53   1        P0M2 |= (1 << OUTAC_MCR);  
+C51 COMPILER V9.60.7.0   USER_GPIO                                                         01/30/2024 09:23:35 PAGE 2   
+
+  54   1      }
+  55          void user_gpio_output_outac_high(void)
+  56          {
+  57   1        OUTAC_PIN = 1;
+  58   1      }
+  59          void user_gpio_output_outac_low(void)
+  60          {
+  61   1        OUTAC_PIN = 0;
+  62   1      
+  63   1      }
+  64          void user_gpio_output_outac_tonggle(void)
+  65          {
+  66   1        OUTAC_PIN =  !OUTAC_PIN;
+  67   1      }
+  68          
+  69          
+  70          
+  71          void user_gpio_output_vs_init(void)
+  72          {
+  73   1        P1M1 &= ~(1 << VS_MCR);
+  74   1        P1M2 |= (1 << VS_MCR);  
+  75   1      }
+  76          void user_gpio_output_vs_high(void)
+  77          {
+  78   1        VS_PIN = 1;
+  79   1      }
+  80          void user_gpio_output_vs_low(void)
+  81          {
+  82   1        VS_PIN = 0;
+  83   1      }
+  84          
+  85          void user_gpio_output_lo_init(void)
+  86          {
+  87   1        P1M1 &= ~(1 << LO_MCR);
+  88   1        P1M2 |= (1 << LO_MCR); 
+  89   1      }
+  90          void user_gpio_output_lo_high(void)
+  91          {
+  92   1        LO_PIN = 1;
+  93   1      }
+  94          void user_gpio_output_lo_low(void)
+  95          {
+  96   1        LO_PIN = 0;
+  97   1      }
+  98          void user_gpio_output_lo_tonggle(void)
+  99          {
+ 100   1        LO_PIN = !LO_PIN;
+ 101   1      }
+ 102          
+ 103          void user_gpio_input_os_init(void)
+ 104          {
+ 105   1        P0M1 |= (1 << OS_MCR);
+ 106   1        P0M2 &= ~(1 << OS_MCR);  
+ 107   1      }
+ 108          
+ 109          bit user_gpio_input_os_read(void)
+ 110          {
+ 111   1        return OS_PIN;
+ 112   1      }
+ 113          
+ 114          
+ 115          void user_gpio_output_pump_init(void)
+C51 COMPILER V9.60.7.0   USER_GPIO                                                         01/30/2024 09:23:35 PAGE 3   
+
+ 116          {
+ 117   1        P0M1 &= ~(1 << PUMP_MCR);
+ 118   1        P0M2 |= (1 << PUMP_MCR); 
+ 119   1      }
+ 120          void user_gpio_output_pump_high(void)
+ 121          {
+ 122   1        PUMP_PIN = 1;
+ 123   1      }
+ 124          void user_gpio_output_pump_low(void)
+ 125          {
+ 126   1        PUMP_PIN = 0;
+ 127   1      }
+ 128          
+ 129          bit user_gpio_input_pump_state(void)
+ 130          {
+ 131   1        bit temp;
+ 132   1        
+ 133   1        // set input
+ 134   1        P0M1 |= (1 << PUMP_MCR);
+ 135   1        P0M2 &= ~(1 << PUMP_MCR);  
+ 136   1        temp = PUMP_PIN;
+ 137   1        P0M1 &= ~(1 << PUMP_MCR);
+ 138   1        P0M2 |= (1 << PUMP_MCR); 
+ 139   1        
+ 140   1        return temp;
+ 141   1      }
+ 142          
+ 143          
+ 144          
+ 145          
+ 146          
+ 147          
+ 148          
+ 149          
+ 150          
+ 151          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    103    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       1
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

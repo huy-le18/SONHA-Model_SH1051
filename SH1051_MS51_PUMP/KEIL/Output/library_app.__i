@@ -1,0 +1,1 @@
+"..\library\library_app\src\library_app.c" LARGE OMF2 OPTIMIZE (7,SPEED) BROWSE INCDIR(..\driver;..\driver\driver_debug\inc;..\library\library_app\inc;..\library\library_debug\inc;..\driver\driver_app\inc;..\library\library_i2c\inc) DEBUG PRINT(.\lst\library_app.lst) TABS (2) OBJECT(.\Output\library_app.obj)
